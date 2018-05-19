@@ -1,5 +1,5 @@
 from bluepy.btle import UUID, Peripheral
-from SpheroConstants import *
+from sphero_constants import *
 import binascii
 import time
 
