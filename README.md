@@ -21,7 +21,7 @@ Here's a basic script that illustrates currently available functions:
     import time
     import random
 
-    sphero = sphero_mini.sphero_mini("f2:54:32:9d:68:a4")
+    sphero = sphero_mini.sphero_mini("f2:54:32:9d:68:a4") # Edit with your own MAC address
 
     sphero.wake()
 
