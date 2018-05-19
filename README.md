@@ -10,7 +10,7 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Go back to sleep (or deep sleep)
 
 ## Dependencies:
-This library uses the Bluepy library for BLE communication, so make sure this is installed:
+This library uses the Bluepy module for BLE communication, so make sure this is installed:
 
     pip install bluepy --user
     
