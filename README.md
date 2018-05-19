@@ -1,11 +1,6 @@
 # Sphero_mini
-An unofficial Python library (work in progress) for controlling the sphero mini robot
+An unofficial Python library (work in progress) for controlling the [Sphero Mini](https://www.sphero.com/sphero-mini) robot
 
-## Dependencies:
-This library uses the Bluepy library for BLE communication, so make sure this is installed:
-
-    pip install bluepy --user
-    
 ## Progress:
 I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
 * Come out of sleep mode
@@ -14,6 +9,11 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Roll in a specified direction at a given speed (no aiming yet)
 * Go back to sleep (or deep sleep)
 
+## Dependencies:
+This library uses the Bluepy library for BLE communication, so make sure this is installed:
+
+    pip install bluepy --user
+    
 ## Usage:
 Here's a basic script that illustrates currently available functions:
 
