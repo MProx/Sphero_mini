@@ -1,5 +1,5 @@
 # Sphero_mini
-An unofficial library (work in progress) for controlling the sphero mini robot
+An unofficial Python library (work in progress) for controlling the sphero mini robot
 
 ## Dependencies:
 Uses the Bluepy library for BLE communication, so make sure this is installed:
