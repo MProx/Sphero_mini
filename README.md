@@ -7,7 +7,12 @@ This library uses the Bluepy library for BLE communication, so make sure this is
     pip install bluepy --user
     
 ## Progress:
-I am actively working on this project, but it is in it's infancy. For now, this library can only make the Sphero Mini come out of sleep, change the LED's colour, and then go back to sleep (or deep sleep).
+I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
+* Come out of sleep mode
+* Change the LED's colour
+* Set back LED intensity
+* Roll in a specified direction at a given speed (no aiming yet)
+* Go back to sleep (or deep sleep)
 
 ## Usage:
 Here's a basic script that illustrates currently available functions:
