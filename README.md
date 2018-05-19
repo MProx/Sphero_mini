@@ -2,7 +2,7 @@
 An unofficial Python library (work in progress) for controlling the sphero mini robot
 
 ## Dependencies:
-Uses the Bluepy library for BLE communication, so make sure this is installed:
+This library uses the Bluepy library for BLE communication, so make sure this is installed:
 
     pip install bluepy --user
     
@@ -10,6 +10,8 @@ Uses the Bluepy library for BLE communication, so make sure this is installed:
 I am actively working on this project, but it is in it's infancy. For now, this library can only make the Sphero Mini come out of sleep, change the LED's colour, and then go back to sleep (or deep sleep).
 
 ## Usage:
+Here's a basic script that illustrates currently available functions:
+
     import sphero_mini
     import time
     import random
