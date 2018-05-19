@@ -43,7 +43,7 @@ class sphero_mini():
         #                   bit inverted (1's complement)"
         checksum = 0
         for num in sendBytes[1:]:
-            checksum = (checksum + num) & 0xFF # bitwise "and to get modulo 256 sum of appropriate bytes
+            checksum = (checksum + num) & 0xFF # bitwise "and" to get modulo 256 sum of appropriate bytes
         checksum = 0xff - checksum # bitwise 'not' to invert checksum bits
         sendBytes += [checksum, sendPacketConstants["EndOfPacket"]] #append
 
