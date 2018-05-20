@@ -4,9 +4,10 @@ An unofficial Python library (work in progress) for controlling the [Sphero Mini
 ## Progress:
 I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
 * Come out of sleep mode
+* Reset the heading (aiming)
 * Change the LED's colour
 * Set back LED intensity
-* Roll in a specified direction at a given speed (no aiming yet)
+* Roll in a specified direction at a given speed
 * Go back to sleep (or deep sleep)
 
 ## Dependencies:
@@ -21,28 +22,36 @@ Here's a basic script that illustrates currently available functions:
     import time
     import random
 
-    sphero = sphero_mini.sphero_mini("f2:54:32:9d:68:a4") # Edit with your own MAC address
+    # Replace with your own MAC address (on Linux, use "sudo hcitool lescan")
+    MAC = "f2:54:32:9d:68:a4"
+    sphero = sphero_mini.sphero_mini(MAC)
 
     sphero.wake()
 
-    sphero.setLEDColour(red=30, green=30, blue=30)
-    sphero.setBackLEDIntensity(250)
+    # Aiming:
+    sphero.setLEDColour(red = 0, green = 0, blue = 0) # Turn main LED off
+    sphero.setBackLEDIntensity(255) # turn back LED on
+    time.sleep(3) # Wait 3 seconds while user aims device
+    sphero.resetHeading() # Reset heading
+    sphero.setBackLEDIntensity(0) # Turn back LED off
+
+    # Turn main LED green:
+    sphero.setLEDColour(red = 0,
+                     green = 255,
+                     blue = 0)
+
+    # roll in specified direction at 150 speed  for 2 seconds
+    sphero.roll(80, 0)
     time.sleep(2)
-    sphero.setBackLEDIntensity(0)
+    sphero.roll(0, 180)
 
-    for i in range(3):
-        sphero.setLEDColour(red=0xff, green=0, blue=0)
-        time.sleep(0.5)
-        sphero.setLEDColour(red=0, green=0xff, blue=0)
-        time.sleep(0.5)
-        sphero.setLEDColour(red=0, green=0, blue=0xff)
-        time.sleep(0.5)
+    time.sleep(1) # Allow device to come to a stop
 
-    # sphero.roll(speed = 50, heading= 180)
-    time.sleep(2) # keep rolling for 2 second
-    sphero.roll(speed = 0, heading = 0) #stop
-    time.sleep(2) # allow time to stabilize before sleeping
+    sphero.roll(80, 180)
+    time.sleep(2)
+    sphero.roll(0, 0)
 
+    time.sleep(1) # Allow device to come to a stop
     sphero.sleep()
 
     sphero.disconnect()
