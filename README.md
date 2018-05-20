@@ -24,7 +24,7 @@ Here's a basic script that illustrates currently available functions:
     import time
     import random
 
-    # Replace with your own MAC address (on Linux, use "sudo hcitool lescan")
+    # Replace with your own Sphero Mini's MAC address (on Linux, use "sudo hcitool lescan")
     MAC = "f2:54:32:9d:68:a4"
     sphero = sphero_mini.sphero_mini(MAC)
 
