@@ -15,15 +15,16 @@ Unknown2 Characteristic <00010003-574f-4f20-5370-6865726f2121>
 
 The rest of the values saved in the dictionaries below, were borrowed from
 @igbopie's javacript library, which is available at https://github.com/igbopie/spherov2.js
+
 '''
 
 deviceID = {"apiProcessor": 16,
             "systemInfo": 17,
             "powerInfo": 19,
-            "driving": 22,
+            "driving": 0x16, # 22
             "animatronics": 23,
             "sensor": 24,
-            "userIO": 26,
+            "userIO": 0x1a, # 26
             "somethingAPI": 31}
 
 SystemInfoCommands = {"mainApplicationVersion": 0x00,
@@ -35,11 +36,7 @@ SystemInfoCommands = {"mainApplicationVersion": 0x00,
 sendPacketConstants = {"StartOfPacket": 0x8D,
                        "EndOfPacket": 0xD8}
 
-userIOCommandIDs = {"allLEDs": 14,
-                   "playAudioFile": 7,
-                   "audioVolume": 8,
-                   "stopAudio": 10,
-                   "testSound": 24}
+userIOCommandIDs = {"allLEDs": 0x0e} # 14
 
 flags= {"isResponse": 1,
         "requestsResponse": 2,
@@ -68,14 +65,14 @@ powerCommandIDs={"deepSleep": 0x00,
                 "something4": 0x1E}
 
 drivingCommands={"rawMotor": 0x01,
-                 "resetYaw": 0x06,
+                 "resetHeading": 0x06,
                  "driveAsSphero": 0x04,
                  "driveAsRc": 0x02,
                  "driveWithHeading": 0x07,
                  "stabilization": 0x0C}
 
 '''
-TBD: Incorporate info from igbopie's javascript lib:
+TO DO: Incorporate info from igbopie's javascript lib:
 
 Animatronics:
     animationBundle = 5
