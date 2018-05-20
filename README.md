@@ -29,29 +29,31 @@ Here's a basic script that illustrates currently available functions:
     sphero.wake()
 
     # Aiming:
-    sphero.setLEDColour(red = 0, green = 0, blue = 0) # Turn main LED off
-    sphero.setBackLEDIntensity(255) # turn back LED on
-    time.sleep(3) # Wait 3 seconds while user aims device
-    sphero.resetHeading() # Reset heading
-    sphero.setBackLEDIntensity(0) # Turn back LED off
+    sphero.setLEDColour(red = 0, green = 0, blue = 0)   # Turn main LED off
+    sphero.setBackLEDIntensity(255)                     # turn back LED on
+    time.sleep(3)                                       # Wait 3 seconds while user aims device
+    sphero.resetHeading()                               # Reset heading
+    sphero.setBackLEDIntensity(0)                       # Turn back LED off
 
     # Turn main LED green:
     sphero.setLEDColour(red = 0,
                      green = 255,
                      blue = 0)
 
-    # roll in specified direction at 150 speed  for 2 seconds
+    # roll in specified direction at 80 speed  for 2 seconds
     sphero.roll(80, 0)
     time.sleep(2)
     sphero.roll(0, 180)
 
     time.sleep(1) # Allow device to come to a stop
 
+    # Come back to start position
     sphero.roll(80, 180)
     time.sleep(2)
     sphero.roll(0, 0)
 
     time.sleep(1) # Allow device to come to a stop
+
     sphero.sleep()
 
     sphero.disconnect()
