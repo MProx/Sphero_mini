@@ -20,6 +20,7 @@ class sphero_mini():
 
         # The following command seems be necessary to prevent the sphero mini from going to sleep again after 10 seconds
         self.characteristics["Anti DOS"].write("usetheforce...band".encode())
+
     def disconnect(self):
         self.p.disconnect()
 
@@ -29,13 +30,25 @@ class sphero_mini():
         appropriate checksum to a specified device ID. Mainly useful because payloads are optional,
         and can be of varying length, to convert packets to binary, and calculate and send the
         checksum. For internal use only.
+
+        Packet structure has the following format (in order):
+
+        - Start byte: always 0x8D
+        - Flags byte: indicate response required, etc
+        - Virtual device ID: see sphero_constants.py
+        - Command ID: see sphero_constants.py
+        - Sequence number: Seems to be arbitrary. I suspect it is used to match commands to response packets (in which the number is echoed).
+        - Payload: Could be varying number of bytes (incl. none), depending on the command
+        - Checksum: See below for calculation
+        - End byte: always 0xD8
+
         '''
         self.sequence += 1 # Increment sequence number (I am not sure that this is necessary, but probably good practice)
         sendBytes = [sendPacketConstants["StartOfPacket"],
                     sum([flags["resetsInactivityTimeout"],flags["requestsResponse"]]),
                     devID,
                     commID,
-                    self.sequence] + payload
+                    self.sequence] + payload # concatenate payload list
 
         # Compute and append checksum and EOP byte:
         # From Sphero docs: "The [checksum is the] modulo 256 sum of all the bytes
@@ -43,22 +56,23 @@ class sphero_mini():
         #                   bit inverted (1's complement)"
         checksum = 0
         for num in sendBytes[1:]:
-            checksum = (checksum + num) & 0xFF # bitwise "and" to get modulo 256 sum of appropriate bytes
+            checksum = (checksum + num) & 0xFF # bitwise "and to get modulo 256 sum of appropriate bytes
         checksum = 0xff - checksum # bitwise 'not' to invert checksum bits
-        sendBytes += [checksum, sendPacketConstants["EndOfPacket"]] #append
+        sendBytes += [checksum, sendPacketConstants["EndOfPacket"]] # concatenate
 
-        # Convert to bytes type object
+        # Convert numbers to bytes
         for byteIndex in range(len(sendBytes)):
             sendBytes[byteIndex] = sendBytes[byteIndex].to_bytes(1, byteorder='big')
         output = b"".join(sendBytes)
 
-        #send to specifiec characteristic:
+        #send to specified characteristic:
         characteristic.write(output)
         time.sleep(0.1) # short pause because it seems that successive commands collide with each other
 
     def wake(self):
         '''
-        Bring device out of sleep mode
+        Bring device out of sleep mode (can only be done if device was in sleep, not deep sleep).
+        If in deep sleep, the device should be connected to USB power to wake.
         '''
         self._send(characteristic=self.characteristics["API V2"],
                    devID=deviceID['powerInfo'],
@@ -85,7 +99,7 @@ class sphero_mini():
         self._send(characteristic = self.characteristics["API V2"],
                   devID = deviceID['userIO'],
                   commID = userIOCommandIDs["allLEDs"],
-                  payload = [0x00, 0x70, red, green, blue]) #no idea where the 0x00 or 0x70 come from - borrowed from igbopie's code
+                  payload = [0x00, 0x0e, red, green, blue])
 
     def roll(self, speed=None, heading=None):
         '''
@@ -93,9 +107,8 @@ class sphero_mini():
         heading: integer from 0 - 360 (degrees)
         speed: Integer from 0 - 255
 
-        NOTE: Aiming has not yet been implemented, so the Sphero will likely begin to move
-        in a seemingly random direction (not actuallly random because the device probably wasn't
-        pointing at zero degrees when you started)
+        Note: the zero heading should be set with the resetYaw function. Otherwise, it may
+        seem that the sphero doesn't honor the heading argument
         '''
         if speed < 0 or speed > 255:
             print("WARNING: roll speed argument outside of allowed range")
@@ -118,4 +131,19 @@ class sphero_mini():
         self._send(characteristic = self.characteristics["API V2"],
                   devID = deviceID['userIO'],
                   commID = userIOCommandIDs["allLEDs"],
-                  payload = [0x00, 0x01, brightness]) #no idea where the 0x00 or 0x70 come from - borrowed from igbopie's code
+                  payload = [0x00, 0x01, brightness])
+
+    def resetHeading(self):
+        '''
+        Reset the heading zero angle to the current heading (useful during aiming)
+        '''
+        self._send(characteristic = self.characteristics["API V2"],
+                  devID = deviceID['driving'],
+                  commID = drivingCommands["resetHeading"],
+                  payload = []) #empty payload
+
+'''
+    To do:
+    - Find out about notificaitons and how to subscribe to them with Bluepy (default delegates, etc)
+    - Subscribe to sensor data (gyro, accelerometers, collision, landing)
+'''
