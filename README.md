@@ -11,11 +11,13 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Go back to sleep (or deep sleep)
 
 ## Dependencies:
-This library uses the Bluepy module for BLE communication, so make sure this is installed:
+This library is being tested with Python 3.2.5, but should work for other 3.x versions. This library also uses the Bluepy module for BLE communication, so make sure this is installed. On Linux:
 
     pip install bluepy --user
     
 ## Usage:
+The class methods are well commented, so for usage of each, see sphero_mini.py. 
+
 Here's a basic script that illustrates currently available functions:
 
     import sphero_mini
