@@ -61,9 +61,7 @@ class sphero_mini():
         sendBytes += [checksum, sendPacketConstants["EndOfPacket"]] # concatenate
 
         # Convert numbers to bytes
-        for byteIndex in range(len(sendBytes)):
-            sendBytes[byteIndex] = sendBytes[byteIndex].to_bytes(1, byteorder='big')
-        output = b"".join(sendBytes)
+        output = b"".join([x.to_bytes(1, byteorder='big') for x in sendBytes])
 
         #send to specified characteristic:
         characteristic.write(output)
