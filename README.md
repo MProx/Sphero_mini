@@ -31,6 +31,7 @@ Here's a basic script that illustrates currently available functions:
     sphero = sphero_mini.sphero_mini(MAC)
 
     sphero.wake()
+    time.sleep(1)
 
     # Aiming:
     sphero.setLEDColour(red = 0, green = 0, blue = 0)   # Turn main LED off
