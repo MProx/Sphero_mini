@@ -118,7 +118,7 @@ class sphero_mini():
         self._send(characteristic = self.characteristics["API V2"],
                   devID = deviceID['driving'],
                   commID = drivingCommands["driveWithHeading"],
-                  payload = [speedL, speedH, headingL, headingH])
+                  payload = [speedL, headingH, headingL, speedH])
 
     def setBackLEDIntensity(self, brightness=None):
         '''
