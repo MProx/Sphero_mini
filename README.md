@@ -31,7 +31,7 @@ Here's a basic script that illustrates currently available functions:
 
     # Aiming:
     sphero.setLEDColour(red = 0, green = 0, blue = 0)   # Turn main LED off
-    sphero.setBackLEDIntensity(255)                     # turn back LED on
+    sphero.setBackLEDIntensity(255)                     # Turn back LED on
     time.sleep(3)                                       # Wait 3 seconds while user aims device
     sphero.resetHeading()                               # Reset heading
     sphero.setBackLEDIntensity(0)                       # Turn back LED off
@@ -52,6 +52,7 @@ Here's a basic script that illustrates currently available functions:
     sphero.roll(80, 180)
     time.sleep(2)
     sphero.roll(0, 0)
+    sphero.setLEDColour(red = 0, green = 0, blue = 0)   # Turn main LED off
 
     time.sleep(1) # Allow device to come to a stop
 
