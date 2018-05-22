@@ -14,7 +14,7 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Subscribe to notifications from BLE characteristics, and receive sensor data (accelerometer, gyro, collision detection, etc)
 
 ## Dependencies:
-This library is being tested with Python 3.2.5, but should work for other 3.x versions. This library also uses the Bluepy module for BLE communication, so make sure this is installed. On Linux:
+This library is being tested with Python 3.2.5, but should work for other 3.x versions. This library also uses the Bluepy module for BLE communication, so make sure this is installed. On Debian-based Linux:
 
     $ sudo apt-get install python-pip libglib2.0-dev
     $ pip install bluepy --user
