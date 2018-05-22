@@ -16,7 +16,8 @@ I am actively working on this project, but it is still in it's infancy. For now,
 ## Dependencies:
 This library is being tested with Python 3.2.5, but should work for other 3.x versions. This library also uses the Bluepy module for BLE communication, so make sure this is installed. On Linux:
 
-    pip install bluepy --user
+    $ sudo apt-get install python-pip libglib2.0-dev
+    $ pip install bluepy --user
     
 ## Usage:
 The class methods are well commented, so for usage of each, see sphero_mini.py. 
