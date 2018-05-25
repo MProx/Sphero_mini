@@ -19,7 +19,11 @@ This library is being tested with Python 3.2.5, but should work for other 3.x ve
 
     $ sudo apt-get install python-pip libglib2.0-dev
     $ pip install bluepy --user
-    
+## Known issues and work-arounds:
+* Sometimes, the bluetooth module fails to connect. If this happens, try again. If it keeps failing, double-check your MAC address.
+* If it keeps failing after that, try re-booting your computer. I find that, expecially after terminating a script with a keyboard interrupt (ctrl+C), the bluetooth module may struggle to reconnect afterwards
+* The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on these.
+
 ## Usage:
 The class methods are well commented, so for usage of each, see sphero_mini.py. 
 
