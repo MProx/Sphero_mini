@@ -1,5 +1,5 @@
 # Sphero_mini
-An unofficial Python library (work in progress) for controlling the [Sphero Mini](https://www.sphero.com/sphero-mini) robot
+An unofficial Python library (work in progress) for controlling the [Sphero Mini](https://www.sphero.com/sphero-mini) robot. Note that, because the communications protocols are very different, this library is unlikely to work out-of-the-box for other types of Sphero robots (e.g. BB8, BB9, SPRK+, etc)
 
 ## Progress:
 I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
@@ -44,7 +44,7 @@ Here's a basic script that illustrates currently available functions.
     if len(sys.argv) < 2:
         print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
         print("eg f2:54:32:9d:68:a4")
-        print('On Linux, use "sudo hcitool lescan" to find your MAC address')
+        print('On Linux, use "sudo hcitool lescan" to find your Sphero Mini's MAC address')
         exit(1)
 
     MAC = sys.argv[1] # Get MAC address from command line argument
