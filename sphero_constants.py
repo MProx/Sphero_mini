@@ -18,20 +18,22 @@ The rest of the values saved in the dictionaries below, were borrowed from
 
 '''
 
-deviceID = {"apiProcessor": 16,
-            "systemInfo": 17,
-            "powerInfo": 19,
-            "driving": 0x16, # 22
-            "animatronics": 23,
-            "sensor": 24,
-            "userIO": 0x1a, # 26
-            "somethingAPI": 31}
+deviceID = {"apiProcessor": 0x10,   # 16
+            "systemInfo": 0x11,     # 17
+            "powerInfo": 0x13,      # 19
+            "driving": 0x16,        # 22
+            "animatronics": 0x17,   # 23
+            "sensor": 0x18,         # 24
+            "something": 0x19,      # 25
+            "userIO": 0x1a,         # 26
+            "somethingAPI": 0x1f}   # 31
 
 SystemInfoCommands = {"mainApplicationVersion": 0x00,
                       "bootloaderVersion": 0x01,
                       "something": 0x06,
+                      "something": 0x13,
                       "something6": 0x12,
-                      "something7": 0x28}
+                      "something7": 0x28} # 40
 
 sendPacketConstants = {"StartOfPacket": 0x8D,
                        "EndOfPacket": 0xD8}
@@ -43,23 +45,10 @@ flags= {"isResponse": 1,
         "requestsOnlyErrorResponse": 4,
         "resetsInactivityTimeout": 8}
 
-# Do not edit the order of the list here:
-characteristicNames=["Name",
-                     "Appearance",
-                     "Peripheral Preferred Connection Parameters",
-                     "Service Changed",
-                     "Unknown1",
-                     "DFU Control",
-                     "DFU Info",
-                     "Anti DOS",
-                     "Battery Level",
-                     "API V2",
-                     "Unknown2"]
-
 powerCommandIDs={"deepSleep": 0x00,
                 "sleep": 0x01,
                 "batteryVoltage": 0x03,
-                "wake": 0x0D,
+                "wake": 0x0D,           #13
                 "something2": 0x10,
                 "something3": 0x04,
                 "something4": 0x1E}
@@ -74,7 +63,7 @@ drivingCommands={"rawMotor": 0x01,
 '''
 TO DO: Incorporate info from igbopie's javascript lib:
 
-Animatronics:
+Animatronics: # Not sure if these all apply to the mini - some might apply to the BB9, etc
     animationBundle = 5
     shoulderAction = 13
     domePosition = 15
@@ -84,11 +73,11 @@ Animatronics:
 Sensor Commands:
     sensorMask = 0
     sensorResponse = 2
-    configureCollision = 17
+    configureCollision = 0x11         # 17
     collisionDetectedAsync = 18
     resetLocator = 19
     enableCollisionAsync = 20
-    sensor1 = 15
+    sensor1 = 0x0F,                   # 15
     sensor2 = 23
-    configureSensorStream = 12
+    configureSensorStream = 0x0C      # 12
 '''
