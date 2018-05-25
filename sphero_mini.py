@@ -1,28 +1,161 @@
-from bluepy.btle import UUID, Peripheral
+from bluepy.btle import * #UUID, Peripheral
+from bluepy import btle
 from sphero_constants import *
 import binascii
 import time
 
+'''
+To do:
+- Subscribe to sensor data (gyro, accelerometers, collision, landing)
+'''
 class sphero_mini():
     def __init__(self, MACAddr):
         '''
-        initialize class instance and then build dictionaries of BLE sevices and characteristics.
-        Also sends text string to Anti-DOS characteristic to prevent returning to sleep.
+        initialize class instance and then build collect BLE sevices and characteristics.
+        Also sends text string to Anti-DOS characteristic to prevent returning to sleep,
+        and initializes notifications (which is what the sphero uses to send data back to
+        the client).
         '''
-        self.sequence = 1
+        self.sequence = 0
 
+        print("Connecting to", MACAddr)
         self.p = Peripheral(MACAddr, "random") #connect
 
-        #Use Bluepy methods to create service and characteristic objects
-        self.svc = {"API V2 Service": self.p.getServiceByUUID("00010001574f4f2053706865726f2121"),
-                    "Nordic DFU Service": self.p.getServiceByUUID("00020001574f4f2053706865726f2121")}
-        self.characteristics = dict(zip(characteristicNames, self.p.getCharacteristics()))
+        print("Initializing... ", end = "")
 
-        # The following command seems be necessary to prevent the sphero mini from going to sleep again after 10 seconds
-        self.characteristics["Anti DOS"].write("usetheforce...band".encode())
+        # Subscribe to notifications
+        self.p.withDelegate(MyDelegate(None))
+
+        # Get characteristics and descriptors
+        self.API_V2_characteristic = self.p.getCharacteristics(uuid="00010002-574f-4f20-5370-6865726f2121")[0]
+        self.AntiDOS_characteristic = self.p.getCharacteristics(uuid="00020005-574f-4f20-5370-6865726f2121")[0]
+        self.DFU_characteristic = self.p.getCharacteristics(uuid="00020002-574f-4f20-5370-6865726f2121")[0]
+        self.DFU2_characteristic = self.p.getCharacteristics(uuid="00020004-574f-4f20-5370-6865726f2121")[0]
+        self.API_descriptor = self.API_V2_characteristic.getDescriptors(forUUID=0x2902)[0]
+        self.DFU_descriptor = self.DFU_characteristic.getDescriptors(forUUID=0x2902)[0]
+        # The rest of this sequence was observed during bluetooth sniffing:
+        # Unlock code: prevent the sphero mini from going to sleep again after 10 seconds
+        self.AntiDOS_characteristic.write("usetheforce...band".encode(), withResponse=True)
+        # Enable DFU notifications:
+        self.DFU_descriptor.write(b"\x01", withResponse = True)
+        # No idea what this is for. Possibly a device ID of sorts? Read request returns '00 00 09 00 0c 00 02 02':
+        _ = self.DFU2_characteristic.read()
+        # Enable API notifications:
+        self.API_descriptor.write(b"\x01", withResponse = True)
+
+        # Finished initializing:
+        print("done")
+
+        self.wake()
 
     def disconnect(self):
+        print("Disconnecting")
         self.p.disconnect()
+
+    def wake(self):
+        '''
+        Bring device out of sleep mode (can only be done if device was in sleep, not deep sleep).
+        If in deep sleep, the device should be connected to USB power to wake.
+        '''
+        print("Waking...", end = "")
+        self._send(characteristic=self.API_V2_characteristic,
+                   devID=deviceID['powerInfo'],
+                   commID=powerCommandIDs["wake"],
+                   payload=[]) # empty payload
+
+        # For some reason, notification bytes for the  wake statement need to be manually called
+        # using the waitForNotifications() method. All others after this come in automatically.
+        while(self.p.waitForNotifications(0.1)):
+             # Each available notification byte for the "wake" comfirmation comes in with each iteration of this look
+             # The processing is handled by the MyDelegate class.
+             pass
+
+    def sleep(self, deepSleep=False):
+        '''
+        Put device to sleep or deep sleep (deep sleep needs USB power connected to wake up)
+        '''
+        if deepSleep:
+            sleepCommID=powerCommandIDs["deepSleep"]
+        else:
+            sleepCommID=powerCommandIDs["sleep"]
+        self._send(characteristic=self.API_V2_characteristic,
+                   devID=deviceID['powerInfo'],
+                   commID=sleepCommID,
+                   payload=[]) #empty payload
+
+    def setLEDColour(self, red = None, green = None, blue = None):
+        '''
+        Set device LED colour based on RGB vales (each can  range between 0 and 0xFF)
+        '''
+        self._send(characteristic = self.API_V2_characteristic,
+                  devID = deviceID['userIO'],
+                  commID = userIOCommandIDs["allLEDs"],
+                  payload = [0x00, 0x0e, red, green, blue])
+
+    def roll(self, speed=None, heading=None):
+        '''
+        Start to move the Sphero at a given direction and speed.
+        heading: integer from 0 - 360 (degrees)
+        speed: Integer from 0 - 255
+
+        Note: the zero heading should be set at startup with the resetHeading method. Otherwise, it may
+        seem that the sphero doesn't honor the heading argument
+        '''
+        if abs(speed) > 255:
+            print("WARNING: roll speed parameter outside of allowed range (-255 to +255)")
+
+        if speed < 0:
+            speed = -1*speed+256 # speed values > 256 in the send packet make the spero go in reverse
+
+        speedH = (speed & 0xFF00) >> 8
+        speedL = speed & 0xFF
+        headingH = (heading & 0xFF00) >> 8
+        headingL = heading & 0xFF
+        self._send(characteristic = self.API_V2_characteristic,
+                  devID = deviceID['driving'],
+                  commID = drivingCommands["driveWithHeading"],
+                  payload = [speedL, headingH, headingL, speedH])
+
+    def setBackLEDIntensity(self, brightness=None):
+        '''
+        Set device LED backlight intensity based on 0-255 values
+
+        NOTE: this is not the same as aiming - it only turns on the LED
+        '''
+        self._send(characteristic = self.API_V2_characteristic,
+                  devID = deviceID['userIO'],
+                  commID = userIOCommandIDs["allLEDs"],
+                  payload = [0x00, 0x01, brightness])
+
+    def resetHeading(self):
+        '''
+        Reset the heading zero angle to the current heading (useful during aiming)
+        '''
+        self._send(characteristic = self.API_V2_characteristic,
+                  devID = deviceID['driving'],
+                  commID = drivingCommands["resetHeading"],
+                  payload = []) #empty payload
+
+    def returnMainApplicationVersion(self):
+        '''
+        Sends command to return application data in a notification
+        TO DO: Parse output and print.
+        '''
+        self._send(self.API_V2_characteristic,
+                   devID=0x11, # sys info
+                   commID=0x00, # main app version
+                   payload=[]) # empty
+
+    def getBatteryVoltage(self):
+        '''
+        Sends command to return battery voltage data in a notification
+        TO DO: Parse output and print.
+        '''
+        print("Getting battery voltage... ", end = "")
+        self._send(self.API_V2_characteristic,
+                   devID=0x13, # power
+                   commID=0x03, # battery
+                   payload=[]) # empty
 
     def _send(self, characteristic=None, devID=None, commID=None, payload=[]):
         '''
@@ -43,9 +176,8 @@ class sphero_mini():
         - End byte: always 0xD8
 
         '''
-        self.sequence += 1 # Increment sequence number (I am not sure that this is necessary, but probably good practice)
         sendBytes = [sendPacketConstants["StartOfPacket"],
-                    sum([flags["resetsInactivityTimeout"],flags["requestsResponse"]]),
+                    sum([flags["resetsInactivityTimeout"], flags["requestsResponse"]]),
                     devID,
                     commID,
                     self.sequence] + payload # concatenate payload list
@@ -63,85 +195,44 @@ class sphero_mini():
         # Convert numbers to bytes
         output = b"".join([x.to_bytes(1, byteorder='big') for x in sendBytes])
 
+        # # DEBUG:
+        # print("Sending ", output, " to ", characteristic)
+
         #send to specified characteristic:
-        characteristic.write(output)
-        time.sleep(0.1) # short pause because it seems that successive commands collide with each other
+        characteristic.write(output, withResponse = True)
+        self.sequence += 1 # Increment sequence number (not sure that this is necessary, but probably good practice)
 
-    def wake(self):
-        '''
-        Bring device out of sleep mode (can only be done if device was in sleep, not deep sleep).
-        If in deep sleep, the device should be connected to USB power to wake.
-        '''
-        self._send(characteristic=self.characteristics["API V2"],
-                   devID=deviceID['powerInfo'],
-                   commID=powerCommandIDs["wake"],
-                   payload=[]) #empty payload
+class MyDelegate(btle.DefaultDelegate, sphero_mini):
+    notificationPayload = "No payload" # class varable, not instance variable - shared between instances
+    def __init__(self, notificationPayload):
+        btle.DefaultDelegate.__init__(self)
+        self.notificationPacket = []
 
-    def sleep(self, deepSleep=False):
+    def handleNotification(self, cHandle, data):
         '''
-        Put device to sleep or deep sleep (deep sleep needs USB power connected to wake up)
-        '''
-        if deepSleep:
-            sleepCommID=powerCommandIDs["deepSleep"]
-        else:
-            sleepCommID=powerCommandIDs["sleep"]
-        self._send(characteristic=self.characteristics["API V2"],
-                   devID=deviceID['powerInfo'],
-                   commID=sleepCommID,
-                   payload=[]) #empty payload
+        This method acts as an interrupt service routine. When a notification comes in, this
+        method is invoked, with the variable 'cHandle' being the handle of the characteristic that
+        sent the notification, and 'data' being the payload (sent one byte at a time, so the packet
+        needs to be reconstructed)
 
-    def setLEDColour(self, red = None, green = None, blue = None):
+        The method keeps appending bytes to the payload packet byte list until end-of-packet byte is
+        encountered. Note that this is an issue, because 0xD8 could be sent as part of the payload of,
+        say, the battery voltage notification. In future, a more sophisticated method will be required.
         '''
-        Set device LED colour based on RGB vales (each can  range between 0 and 0xFF)
-        '''
-        self._send(characteristic = self.characteristics["API V2"],
-                  devID = deviceID['userIO'],
-                  commID = userIOCommandIDs["allLEDs"],
-                  payload = [0x00, 0x0e, red, green, blue])
-
-    def roll(self, speed=None, heading=None):
-        '''
-        Start to move the Sphero at a given direction and speed.
-        heading: integer from 0 - 360 (degrees)
-        speed: Integer from 0 - 255
-
-        Note: the zero heading should be set with the resetYaw function. Otherwise, it may
-        seem that the sphero doesn't honor the heading argument
-        '''
-        if speed < 0 or speed > 255:
-            print("WARNING: roll speed argument outside of allowed range")
-
-        speedH = (speed & 0xFF00) >> 8
-        speedL = speed & 0xFF
-        headingH = (heading & 0xFF00) >> 8
-        headingL = heading & 0xFF
-        self._send(characteristic = self.characteristics["API V2"],
-                  devID = deviceID['driving'],
-                  commID = drivingCommands["driveWithHeading"],
-                  payload = [speedL, headingH, headingL, speedH])
-
-    def setBackLEDIntensity(self, brightness=None):
-        '''
-        Set device LED backlight intensity based on 0-255 values
-
-        NOTE: this is not the same as aiming - it only turns on the LED
-        '''
-        self._send(characteristic = self.characteristics["API V2"],
-                  devID = deviceID['userIO'],
-                  commID = userIOCommandIDs["allLEDs"],
-                  payload = [0x00, 0x01, brightness])
-
-    def resetHeading(self):
-        '''
-        Reset the heading zero angle to the current heading (useful during aiming)
-        '''
-        self._send(characteristic = self.characteristics["API V2"],
-                  devID = deviceID['driving'],
-                  commID = drivingCommands["resetHeading"],
-                  payload = []) #empty payload
-
-'''
-    To do:
-    - Find out about notificaitons and how to subscribe to them with Bluepy (default delegates, etc)
-    - Subscribe to sensor data (gyro, accelerometers, collision, landing)
-'''
+        self.notificationPacket.append(int.from_bytes(data, byteorder="big"))
+        if data == b'\xd8' and len(self.notificationPacket) >= 8:
+            # Once the packet is assembled, parse it:
+            # Packet structure is similar to the outgoing send packets (see docstring in sphero_mini._send())
+            # Check that first packet is start, and that the first bit of the second packet (flags byte)
+            # indicates a response packets (see "flags")
+            if data[0] != sendPacketConstants['StartOfPacket'] or not data[1] & flags['isResponse']:
+                if len(self.notificationPacket) > 8: # Contains payload
+                    notificationPayload = self.notificationPacket[5:-2]
+                # Possibly change the below to a switch/case structure
+                if self.notificationPacket[:4] == [141, 9, 19, 13]:
+                    print("Wake acknowledged")
+                elif self.notificationPacket[:4] == [141, 9, 19, 3]:
+                    print((notificationPayload[2] + notificationPayload[1]*256 + notificationPayload[0]*65536)/100, "v")
+                # else: #default
+                #     print("Packet recived: ", self.notificationPacket)
+            self.notificationPacket = [] # Start new payload after this byte
