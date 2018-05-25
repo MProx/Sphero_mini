@@ -148,8 +148,8 @@ class sphero_mini():
 
     def getBatteryVoltage(self):
         '''
-        Sends command to return battery voltage data in a notification
-        TO DO: Parse output and print.
+        Sends command to return battery voltage data in a notification.
+        Data printed to console screen by the handleNotifications() method in the MyDelegate class.
         '''
         print("Getting battery voltage... ", end = "")
         self._send(self.API_V2_characteristic,
@@ -203,7 +203,14 @@ class sphero_mini():
         self.sequence += 1 # Increment sequence number (not sure that this is necessary, but probably good practice)
 
 class MyDelegate(btle.DefaultDelegate, sphero_mini):
+    '''
+    Class used to handle notifications sent by the Sphero to the client
+    See https://ianharvey.github.io/bluepy-doc/notifications.html
+    '''
+    
     notificationPayload = "No payload" # class varable, not instance variable - shared between instances
+                                       # (might be relevant if connecting to more than one sphero)
+
     def __init__(self, notificationPayload):
         btle.DefaultDelegate.__init__(self)
         self.notificationPacket = []
