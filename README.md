@@ -37,7 +37,6 @@ Here's a basic script that illustrates currently available functions.
     import time
     import sys
 
-    # Replace with your own MAC address (on Linux, use "sudo hcitool lescan")
     if len(sys.argv) < 2:
         print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
         print("eg f2:54:32:9d:68:a4")
