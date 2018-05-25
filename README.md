@@ -64,12 +64,12 @@ Here's a basic script that illustrates currently available functions.
     sphero.setBackLEDIntensity(0) # Turn back LED off
 
     # Roll forward for 1 second
-    sphero.setLEDColor(red = 0, green = 0, blue = 255) # Turn main LED off
+    sphero.setLEDColor(red = 0, green = 0, blue = 255) # Turn main LED blue
     sphero.roll(50, 0)  # roll forwards (heading = 0) at speed = 50
     time.sleep(3)       # keep rolling for 1 second
     sphero.roll(0, 0)   # stop
     time.sleep(1)       # Wait to come to a stop
-    sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn main LED off
+    sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn main LED green
     sphero.roll(-50, 0) # roll backwards at speed = 50 for 1 second
     time.sleep(3)       # Keep rolling for 1 second
     sphero.roll(0, 0)   # stop
