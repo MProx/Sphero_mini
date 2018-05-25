@@ -83,9 +83,9 @@ class sphero_mini():
                    commID=sleepCommID,
                    payload=[]) #empty payload
 
-    def setLEDColour(self, red = None, green = None, blue = None):
+    def setLEDColor(self, red = None, green = None, blue = None):
         '''
-        Set device LED colour based on RGB vales (each can  range between 0 and 0xFF)
+        Set device LED color based on RGB vales (each can  range between 0 and 0xFF)
         '''
         self._send(characteristic = self.API_V2_characteristic,
                   devID = deviceID['userIO'],
@@ -157,6 +157,21 @@ class sphero_mini():
                    commID=0x03, # battery
                    payload=[]) # empty
 
+    def stabilization(self, stab = True):
+        '''
+        Sends command to turn on/off the motor stabilization system (required when manually turning/aiming the sphero)
+        '''
+        if stab == True:
+            print("Enabling stabilization... ", end = "")
+            val = 1
+        else:
+            print("Disabling stabilization... ", end = "")
+            val = 0
+        self._send(self.API_V2_characteristic,
+                   devID=deviceID['driving'],
+                   commID=drivingCommands['stabilization'],
+                   payload=[val])
+
     def _send(self, characteristic=None, devID=None, commID=None, payload=[]):
         '''
         A generic "send" method, which will be used by other methods to send a command ID, payload and
@@ -203,13 +218,8 @@ class sphero_mini():
         self.sequence += 1 # Increment sequence number (not sure that this is necessary, but probably good practice)
 
 class MyDelegate(btle.DefaultDelegate, sphero_mini):
-    '''
-    Class used to handle notifications sent by the Sphero to the client
-    See https://ianharvey.github.io/bluepy-doc/notifications.html
-    '''
-    
     notificationPayload = "No payload" # class varable, not instance variable - shared between instances
-                                       # (might be relevant if connecting to more than one sphero)
+                                       # Might be relevant if connecting to more than one sphero
 
     def __init__(self, notificationPayload):
         btle.DefaultDelegate.__init__(self)
@@ -236,10 +246,10 @@ class MyDelegate(btle.DefaultDelegate, sphero_mini):
                 if len(self.notificationPacket) > 8: # Contains payload
                     notificationPayload = self.notificationPacket[5:-2]
                 # Possibly change the below to a switch/case structure
-                if self.notificationPacket[:4] == [141, 9, 19, 13]:
+                if self.notificationPacket[:4] == [141, 9, 19, 13]: # Acknoeledgement after wake command
                     print("Wake acknowledged")
-                elif self.notificationPacket[:4] == [141, 9, 19, 3]:
+                elif self.notificationPacket[:4] == [141, 9, 19, 3]: # Sphero returning battery voltage
                     print((notificationPayload[2] + notificationPayload[1]*256 + notificationPayload[0]*65536)/100, "v")
-                # else: #default
+                # else: # default, for unrecognized commands (usually silenced)
                 #     print("Packet recived: ", self.notificationPacket)
             self.notificationPacket = [] # Start new payload after this byte
