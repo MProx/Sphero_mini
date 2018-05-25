@@ -1,4 +1,4 @@
-from bluepy.btle import * #UUID, Peripheral
+from bluepy.btle import *
 from bluepy import btle
 from sphero_constants import *
 import binascii
