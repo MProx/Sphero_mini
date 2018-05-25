@@ -63,7 +63,7 @@ Here's a basic script that illustrates currently available functions.
     sphero.resetHeading() # Reset heading
     sphero.setBackLEDIntensity(0) # Turn back LED off
 
-    # Roll forward for 1 second
+    # Move around:
     sphero.setLEDColor(red = 0, green = 0, blue = 255) # Turn main LED blue
     sphero.roll(50, 0)  # roll forwards (heading = 0) at speed = 50
     time.sleep(3)       # keep rolling for 1 second
