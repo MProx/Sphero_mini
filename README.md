@@ -44,7 +44,7 @@ Here's a basic script that illustrates currently available functions.
     if len(sys.argv) < 2:
         print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
         print("eg f2:54:32:9d:68:a4")
-        print('On Linux, use "sudo hcitool lescan" to find your Sphero Mini's MAC address')
+        print("On Linux, use 'sudo hcitool lescan' to find your Sphero Mini's MAC address")
         exit(1)
 
     MAC = sys.argv[1] # Get MAC address from command line argument
@@ -52,24 +52,24 @@ Here's a basic script that illustrates currently available functions.
     # Connect:
     sphero = sphero_mini.sphero_mini(MAC)
 
-    # Sends instruction to return battery voltage 
+    # Sends instruction to return battery voltage
     # (Printed to the console screen as a notification)
     sphero.getBatteryVoltage()
 
     # Aiming:
-    sphero.setLEDColour(red = 0, green = 0, blue = 0) # Turn main LED off
+    sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn main LED off
     sphero.setBackLEDIntensity(255) # turn back LED on
     time.sleep(3) # Wait 3 seconds while user aims device
     sphero.resetHeading() # Reset heading
     sphero.setBackLEDIntensity(0) # Turn back LED off
 
     # Roll forward for 1 second
-    sphero.setLEDColour(red = 0, green = 0, blue = 255) # Turn main LED off
+    sphero.setLEDColor(red = 0, green = 0, blue = 255) # Turn main LED off
     sphero.roll(50, 0)  # roll forwards (heading = 0) at speed = 50
     time.sleep(3)       # keep rolling for 1 second
     sphero.roll(0, 0)   # stop
     time.sleep(1)       # Wait to come to a stop
-    sphero.setLEDColour(red = 0, green = 255, blue = 0) # Turn main LED off
+    sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn main LED off
     sphero.roll(-50, 0) # roll backwards at speed = 50 for 1 second
     time.sleep(3)       # Keep rolling for 1 second
     sphero.roll(0, 0)   # stop
