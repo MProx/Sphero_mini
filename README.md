@@ -25,8 +25,7 @@ This library is being tested with Python 3.6.5, but should work for other 3.x ve
 * Sometimes, the bluetooth module fails to connect. If this happens, try again. If it keeps failing, double-check your MAC address.
 * If it still fails, try connecting the sphero to USB power briefly and then disconnecting. This resets the microcontroller.
 * If it keeps failing after that, try re-booting your computer. I find that, expecially after terminating a script with a keyboard interrupt (ctrl+C), the bluetooth module may struggle to reconnect afterwards
-* The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on things like command acknowledgements, battery voltage reporting, etc.
-* I recently fixed a bug that caused notifications (battery voltage, etc) to fail unless the sphero had been connected to the Edu app after the last reset. If you are still having issues with the notifications, please contact me. 
+* The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on things like command acknowledgements, battery voltage reporting, etc. 
 
 ## Usage:
 The class methods are well commented, so for usage of each, see sphero_mini.py. 
