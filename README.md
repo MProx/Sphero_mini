@@ -1,5 +1,7 @@
-# Sphero_mini
-An unofficial Python library (work in progress) for controlling the [Sphero Mini](https://www.sphero.com/sphero-mini) robot. Note that, because the communications protocols are very different, this library is unlikely to work out-of-the-box for other types of Sphero robots (e.g. BB8, BB9, SPRK+, etc)
+# Sphero Mini
+An unofficial Python library (work in progress) for controlling the [Sphero Mini](https://www.sphero.com/sphero-mini) robot. Note that, because the communications protocols are very different, this library is unlikely to work out-of-the-box for other types of Sphero robots (e.g. BB8, BB9, SPRK+, etc).
+
+If you use this library for anything fun, please let me know.
 
 ## Progress:
 I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
@@ -24,11 +26,12 @@ This library is being tested with Python 3.2.5, but should work for other 3.x ve
 * If it still fails, try connecting the sphero to USB power briefly and then disconnecting. This resets the microcontroller.
 * If it keeps failing after that, try re-booting your computer. I find that, expecially after terminating a script with a keyboard interrupt (ctrl+C), the bluetooth module may struggle to reconnect afterwards
 * The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on things like command acknowledgements, battery voltage reporting, etc.
+* I recently fixed a bug that caused notifications (battery voltage, etc) to fail unless the sphero had been connected to the Edu app after the last reset. If you are still having issues with the notifications, please contact me. 
 
 ## Usage:
 The class methods are well commented, so for usage of each, see sphero_mini.py. 
 
-Save the below script to a .py file, and make sure that sphero_mini.py is saved in the same folder, then run the following command from linux command prompt:
+Save the below script to a .py file, and make sure that both sphero_mini.py and sphero_constants.py are saved in the same folder, then run the following command from linux command prompt:
 
     $ python [this_file_name.py] [sphero MAC address]
 
@@ -67,12 +70,12 @@ Here's a basic script that illustrates currently available functions.
     # Move around:
     sphero.setLEDColor(red = 0, green = 0, blue = 255) # Turn main LED blue
     sphero.roll(50, 0)  # roll forwards (heading = 0) at speed = 50
-    time.sleep(3)       # keep rolling for 1 second
+    time.sleep(3)       # keep rolling for 3 second
     sphero.roll(0, 0)   # stop
     time.sleep(1)       # Wait to come to a stop
     sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn main LED green
     sphero.roll(-50, 0) # roll backwards at speed = 50 for 1 second
-    time.sleep(3)       # Keep rolling for 1 second
+    time.sleep(3)       # Keep rolling for 3 second
     sphero.roll(0, 0)   # stop
     time.sleep(1)       # Wait to come to a stop
 
