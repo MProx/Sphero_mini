@@ -2,12 +2,12 @@ from bluepy.btle import *
 from bluepy import btle
 from sphero_constants import *
 import binascii
-import time
 
 '''
 To do:
 - Subscribe to sensor data (gyro, accelerometers, collision, landing)
 '''
+
 class sphero_mini():
     def __init__(self, MACAddr):
         '''
@@ -21,11 +21,12 @@ class sphero_mini():
         print("Connecting to", MACAddr)
         self.p = Peripheral(MACAddr, "random") #connect
 
-        print("Initializing... ", end = "")
+        print("Initializing... ")
 
         # Subscribe to notifications
-        self.p.withDelegate(MyDelegate(None))
+        self.p.setDelegate(MyDelegate())
 
+        print(" - Read all characteristics and descriptors")
         # Get characteristics and descriptors
         self.API_V2_characteristic = self.p.getCharacteristics(uuid="00010002-574f-4f20-5370-6865726f2121")[0]
         self.AntiDOS_characteristic = self.p.getCharacteristics(uuid="00020005-574f-4f20-5370-6865726f2121")[0]
@@ -33,20 +34,29 @@ class sphero_mini():
         self.DFU2_characteristic = self.p.getCharacteristics(uuid="00020004-574f-4f20-5370-6865726f2121")[0]
         self.API_descriptor = self.API_V2_characteristic.getDescriptors(forUUID=0x2902)[0]
         self.DFU_descriptor = self.DFU_characteristic.getDescriptors(forUUID=0x2902)[0]
+
         # The rest of this sequence was observed during bluetooth sniffing:
         # Unlock code: prevent the sphero mini from going to sleep again after 10 seconds
+        print(" - Writing AntiDOS characteristic unlock code")
         self.AntiDOS_characteristic.write("usetheforce...band".encode(), withResponse=True)
+
         # Enable DFU notifications:
-        self.DFU_descriptor.write(b"\x01", withResponse = True)
+        print(" - Writing 0x0001 to DFU descriptor")
+        self.DFU_descriptor.write(struct.pack('<bb', 0x01, 0x00), withResponse = True)
+
         # No idea what this is for. Possibly a device ID of sorts? Read request returns '00 00 09 00 0c 00 02 02':
+        print(" - Reading DFU2 characteristic")
         _ = self.DFU2_characteristic.read()
+
         # Enable API notifications:
-        self.API_descriptor.write(b"\x01", withResponse = True)
+        print(" - Writing 0x0001 to API dectriptor")
+        self.API_descriptor.write(struct.pack('<bb', 0x01, 0x00), withResponse = True)
 
-        # Finished initializing:
-        print("done")
-
+        print(" - Waking...")
         self.wake()
+              
+        # Finished initializing:
+        print("Initialization complete")
 
     def disconnect(self):
         print("Disconnecting")
@@ -57,17 +67,13 @@ class sphero_mini():
         Bring device out of sleep mode (can only be done if device was in sleep, not deep sleep).
         If in deep sleep, the device should be connected to USB power to wake.
         '''
-        print("Waking...", end = "")
         self._send(characteristic=self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
                    commID=powerCommandIDs["wake"],
                    payload=[]) # empty payload
 
-        # For some reason, notification bytes for the  wake statement need to be manually called
-        # using the waitForNotifications() method. All others after this come in automatically.
-        while(self.p.waitForNotifications(0.1)):
-             # Each available notification byte for the "wake" comfirmation comes in with each iteration of this look
-             # The processing is handled by the MyDelegate class.
+        #wait for wake acknowledgement to come in
+        while(self.p.waitForNotifications(1)):
              pass
 
     def sleep(self, deepSleep=False):
@@ -76,6 +82,7 @@ class sphero_mini():
         '''
         if deepSleep:
             sleepCommID=powerCommandIDs["deepSleep"]
+            print("Going into deep sleep. Connect power to wake.")
         else:
             sleepCommID=powerCommandIDs["sleep"]
         self._send(characteristic=self.API_V2_characteristic,
@@ -151,21 +158,25 @@ class sphero_mini():
         Sends command to return battery voltage data in a notification.
         Data printed to console screen by the handleNotifications() method in the MyDelegate class.
         '''
-        print("Getting battery voltage... ", end = "")
+        print("Requesting battery voltage...", )
         self._send(self.API_V2_characteristic,
                    devID=0x13, # power
                    commID=0x03, # battery
                    payload=[]) # empty
+
+        #wait for battery voltage notification to come in
+        while(self.p.waitForNotifications(1)):
+             pass
 
     def stabilization(self, stab = True):
         '''
         Sends command to turn on/off the motor stabilization system (required when manually turning/aiming the sphero)
         '''
         if stab == True:
-            print("Enabling stabilization... ", end = "")
+            print("Enabling stabilization... ")
             val = 1
         else:
-            print("Disabling stabilization... ", end = "")
+            print("Disabling stabilization... ")
             val = 0
         self._send(self.API_V2_characteristic,
                    devID=deviceID['driving'],
@@ -215,13 +226,14 @@ class sphero_mini():
 
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
+
         self.sequence += 1 # Increment sequence number (not sure that this is necessary, but probably good practice)
+        if self.sequence > 255:
+            self.sequence = 0
 
-class MyDelegate(btle.DefaultDelegate, sphero_mini):
-    notificationPayload = "No payload" # class varable, not instance variable - shared between instances
-                                       # Might be relevant if connecting to more than one sphero
+class MyDelegate(btle.DefaultDelegate):
 
-    def __init__(self, notificationPayload):
+    def __init__(self):
         btle.DefaultDelegate.__init__(self)
         self.notificationPacket = []
 
@@ -236,8 +248,10 @@ class MyDelegate(btle.DefaultDelegate, sphero_mini):
         encountered. Note that this is an issue, because 0xD8 could be sent as part of the payload of,
         say, the battery voltage notification. In future, a more sophisticated method will be required.
         '''
+
         self.notificationPacket.append(int.from_bytes(data, byteorder="big"))
-        if data == b'\xd8' and len(self.notificationPacket) >= 8:
+        # If end of packet:
+        if data == b'\xd8':
             # Once the packet is assembled, parse it:
             # Packet structure is similar to the outgoing send packets (see docstring in sphero_mini._send())
             # Check that first packet is start, and that the first bit of the second packet (flags byte)
@@ -245,11 +259,17 @@ class MyDelegate(btle.DefaultDelegate, sphero_mini):
             if data[0] != sendPacketConstants['StartOfPacket'] or not data[1] & flags['isResponse']:
                 if len(self.notificationPacket) > 8: # Contains payload
                     notificationPayload = self.notificationPacket[5:-2]
-                # Possibly change the below to a switch/case structure
-                if self.notificationPacket[:4] == [141, 9, 19, 13]: # Acknoeledgement after wake command
-                    print("Wake acknowledged")
+                               
+                # Recognize these common notifications:
+                if self.notificationPacket[:4] == [141, 9, 19, 13]: # Acknowledgement after wake command
+                    print(" - Wake acknowledged")
+
                 elif self.notificationPacket[:4] == [141, 9, 19, 3]: # Sphero returning battery voltage
-                    print((notificationPayload[2] + notificationPayload[1]*256 + notificationPayload[0]*65536)/100, "v")
+                    print("Battery voltage:", 
+                          (notificationPayload[2] + notificationPayload[1]*256 + notificationPayload[0]*65536)/100, 
+                          "v")
+
                 # else: # default, for unrecognized commands (usually silenced)
-                #     print("Packet recived: ", self.notificationPacket)
+                #      print("Packet recived: ", self.notificationPacket)
+
             self.notificationPacket = [] # Start new payload after this byte
