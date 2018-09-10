@@ -4,11 +4,6 @@ from sphero_constants import *
 import binascii
 import time
 
-'''
-To do:
-- Subscribe to sensor data (gyro, accelerometers, collision, landing)
-'''
-
 class sphero_mini():
     def __init__(self, MACAddr, showAcks = True):
         '''
@@ -282,13 +277,19 @@ class sphero_mini():
                                      method = 0x01): # Must be 0x01
         '''
         Appears to function the same as other Sphero models, however speed settings seem to have no effect. 
+        NOTE: Setting to zero seems to cause bluetooth errors with the Sphero Mini/bluepy library - set to 
+        255 to make it effectively disabled.
+
+        deadTime disables future collisions for a short period of time to avoid repeat triggering by the same
+        event. Set in 10ms increments. So if deadTime = 50, that means the delay will be 500ms, or half a second.
+        
         From Sphero docs:
         
-        xThreshold/yThreshold: An 8-bit settable threshold for the X (left/right) and Y (front/back) axes 
-        of Sphero. A value of 00h disables the contribution of that axis.
+            xThreshold/yThreshold: An 8-bit settable threshold for the X (left/right) and Y (front/back) axes 
+            of Sphero.
 
-        xSpeed/ySpeed: An 8-bit settable speed value for the X and Y axes. This setting is ranged by the 
-        speed, then added to xThreshold, yThreshold to generate the final threshold value.
+            xSpeed/ySpeed: An 8-bit settable speed value for the X and Y axes. This setting is ranged by the 
+            speed, then added to xThreshold, yThreshold to generate the final threshold value.
         '''
         
         print("Configuring collision detection")
@@ -302,7 +303,10 @@ class sphero_mini():
     def configureSensorStream(self): # Use default values
         '''
         Send command to configure sensor stream using default values as found during bluetooth 
-        sniffing of the Sphero Edu app:
+        sniffing of the Sphero Edu app.
+
+        Must be called after calling configureSensorStream()
+
         '''
         print("Configuring sensor stream detection")
         self._send(self.API_V2_characteristic,
@@ -315,7 +319,7 @@ class sphero_mini():
     def configureSensorMask(self): # Use default values
         '''
         Send command to configure sensor mask using default values as found during bluetooth 
-        sniffing of the Sphero Edu app:
+        sniffing of the Sphero Edu app        
         '''
         print("Configuring sensor mask")
         self._send(self.API_V2_characteristic,
@@ -398,11 +402,6 @@ class MyDelegate(btle.DefaultDelegate):
                     if devid == deviceID['powerInfo'] and commcode == powerCommandIDs['wake']:
                         self.notification_ack = "Wake acknowledged" # Acknowledgement after wake command
                         
-                    elif devid == deviceID['powerInfo'] and commcode == powerCommandIDs['batteryVoltage']:
-                        V_batt = notification_payload[2] + notification_payload[1]*256 + notification_payload[0]*65536
-                        V_batt /= 100 # Notification gives V_batt in 10mV increments. Divide by 100 to get to volts.
-                        self.notification_ack = "Battery voltage:" + str(V_batt) + "v"
-
                     elif devid == deviceID['driving'] and commcode == drivingCommands['driveWithHeading']:
                         self.notification_ack = "Roll command acknowledged"
 
@@ -430,6 +429,11 @@ class MyDelegate(btle.DefaultDelegate):
                     elif devid == deviceID['sensor'] and commcode == sensorCommands["sensor2"]:
                         self.notification_ack = "Sensor2 acknowledged"
 
+                    elif devid == deviceID['powerInfo'] and commcode == powerCommandIDs['batteryVoltage']:
+                        V_batt = notification_payload[2] + notification_payload[1]*256 + notification_payload[0]*65536
+                        V_batt /= 100 # Notification gives V_batt in 10mV increments. Divide by 100 to get to volts.
+                        self.notification_ack = "Battery voltage:" + str(V_batt) + "v"
+
                     elif devid == deviceID['systemInfo'] and commcode == SystemInfoCommands['mainApplicationVersion']:
                         version = str(notification_payload[0])
                         for byte in notification_payload[1:]:
@@ -447,17 +451,17 @@ class MyDelegate(btle.DefaultDelegate):
 
                     if devid == deviceID['sensor'] and commcode == sensorCommands['collisionDetectedAsync']:
                         print("Collision detected:")
-                        print(notification_payload[0], "<- always 255")
+                        print(notification_payload[0], "<- always 255?")
                         print(notification_payload[1])
                         print(notification_payload[2])
                         print(notification_payload[3])
                         print(notification_payload[4])
-                        print(notification_payload[5], "<- always 0")
-                        print(notification_payload[6], "<- always 0")
+                        print(notification_payload[5], "<- always 0?")
+                        print(notification_payload[6], "<- always 0?")
                         print(notification_payload[7], "<- Axis")
-                        print(notification_payload[8], "<- always 0")
+                        print(notification_payload[8], "<- always 0?")
                         print(notification_payload[9], "<- X Magnitude")
-                        print(notification_payload[10], "<- always 0")
+                        print(notification_payload[10], "<- always 0?")
                         print(notification_payload[11], "<- Y Magnitude" )
                         print(notification_payload[12], "<- Time stamp")
                     # TODO: parse other types of asynch notifications (sensors data, battery voltage, etc)
@@ -465,8 +469,6 @@ class MyDelegate(btle.DefaultDelegate):
                     else:
                         self.notification_ack = "Unknown asynchronous notification" #print(self.notificationPacket)
                         print(self.notificationPacket, "===================> Unknown packet")
-                        
-
                     
             self.lastPacket = self.notificationPacket
             self.notificationPacket = [] # Start new payload after this byte
