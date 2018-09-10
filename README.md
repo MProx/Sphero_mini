@@ -18,6 +18,12 @@ As an example demonstrating basic usage, see run.py. Make sure that both sphero_
 
 On Linux, use 'sudo hcitool lescan' to find your Sphero Mini's MAC address.
 
+Note on usage: If you need to use delays, you can use time.sleep(), but this is a blocking function. Any asynchronous notifications that come in during the delay period can only be processed when it ends. Instead, use the provided convenience function:
+
+    sphero.wait(delay)
+
+where delay is a value in seconds.
+
 ## Troubleshooting, known issues and work-arounds:
 * Sometimes, the bluetooth module fails to connect. If this happens, try again. If it keeps failing, double-check your MAC address.
 * If it still fails, try connecting the sphero to USB power briefly and then disconnecting. This resets the microcontroller.
