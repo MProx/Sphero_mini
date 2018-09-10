@@ -6,21 +6,21 @@ If you use this library for anything fun, please let me know - MProx.contact@gma
 ## Dependencies:
 This library is being tested with Python 3.6.5, but should work for other 3.x versions. This library also uses the Bluepy module for BLE communication, so make sure this is installed. On Debian-based Linux:
 
-    $ sudo apt-get install libglib2.0-dev
-    $ pip install bluepy --user
+> $ sudo apt-get install libglib2.0-dev
+> $ pip install bluepy --user
 
 ## Usage:
 The class methods are well commented, so for usage of each, see sphero_mini.py. 
 
 As an example demonstrating basic usage, see run.py. Make sure that both sphero_mini.py and sphero_constants.py are saved in the same folder as run.py. Then from linux command prompt, navigate to that folder and run the following command:
 
-    $ python run.py [sphero MAC address]
+> $ python run.py [sphero MAC address]
 
 On Linux, use 'sudo hcitool lescan' to find your Sphero Mini's MAC address.
 
 Note on usage: If you need to use delays, you can use time.sleep(), but this is a blocking function. Any asynchronous notifications that come in during the delay period can only be processed when it ends. If you need asynchronous commands (e.g. collision detection) to be processed immediately, use the provided convenience function:
 
-    sphero.wait(delay)
+> sphero.wait(delay)
 
 where delay is a value in seconds.
 
