@@ -202,21 +202,27 @@ class sphero_mini():
         self.getAcknowledgement("Stabilization")
 
 # =======================================================================
+# The following functions are experimental:
+# =======================================================================
 
-    def configureCollissionDetection(self,
-                                     xThreshold = 255, 
-                                     yThreshold = 255, 
+    def configureCollisionDetection(self,
+                                     xThreshold = 50, 
+                                     yThreshold = 50, 
                                      xSpeed = 50, 
-                                     ySpeed = 255, 
+                                     ySpeed = 50, 
                                      deadTime = 50, # in 10 millisecond increments.
                                      method = 0x01): # Must be 0x01
         '''
+        Appears to function the same as other Sphero models, however speed settings seem to have no effect. 
+        From Sphero docs:
+        
         xThreshold/yThreshold: An 8-bit settable threshold for the X (left/right) and Y (front/back) axes 
         of Sphero. A value of 00h disables the contribution of that axis.
 
         xSpeed/ySpeed: An 8-bit settable speed value for the X and Y axes. This setting is ranged by the 
         speed, then added to xThreshold, yThreshold to generate the final threshold value.
         '''
+        
         print("Configuring collision detection")
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -226,6 +232,10 @@ class sphero_mini():
         self.getAcknowledgement("Collision")
 
     def configureSensorStream(self): # Use default values
+        '''
+        Send command to configure sensor stream using default values as found during bluetooth 
+        sniffing of the Sphero Edu app:
+        '''
         print("Configuring sensor stream detection")
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -235,6 +245,10 @@ class sphero_mini():
         self.getAcknowledgement("Sensor")
 
     def configureSensorMask(self): # Use default values
+        '''
+        Send command to configure sensor mask using default values as found during bluetooth 
+        sniffing of the Sphero Edu app:
+        '''
         print("Configuring sensor mask")
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -242,24 +256,6 @@ class sphero_mini():
                    payload=[0x00, 0x32, 0x00, 0x00, 0x07, 0xe0, 0x78])
 
         self.getAcknowledgement("Mask")
-
-    def sensor1(self): # Use default values
-        print("Query sensor 1")
-        self._send(self.API_V2_characteristic,
-                   devID=deviceID['sensor'],
-                   commID=sensorCommands['sensor1'],
-                   payload=[0x01])
-
-        self.getAcknowledgement("Sensor")
-
-    def sensor2(self): # Use default values
-        print("Query sensor 2")
-        self._send(self.API_V2_characteristic,
-                   devID=deviceID['sensor'],
-                   commID=sensorCommands['sensor2'],
-                   payload=[0x00])
-
-        self.getAcknowledgement("Sensor")
 
 # =======================================================================
 
