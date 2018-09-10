@@ -18,66 +18,55 @@ The rest of the values saved in the dictionaries below, were borrowed from
 
 '''
 
-deviceID = {"apiProcessor": 0x10,   # 16
-            "systemInfo": 0x11,     # 17
-            "powerInfo": 0x13,      # 19
-            "driving": 0x16,        # 22
-            "animatronics": 0x17,   # 23
-            "sensor": 0x18,         # 24
-            "something": 0x19,      # 25
-            "userIO": 0x1a,         # 26
-            "somethingAPI": 0x1f}   # 31
+deviceID = {"apiProcessor": 0x10,                   # 16
+            "systemInfo": 0x11,                     # 17
+            "powerInfo": 0x13,                      # 19
+            "driving": 0x16,                        # 22
+            "animatronics": 0x17,                   # 23
+            "sensor": 0x18,                         # 24
+            "something": 0x19,                      # 25
+            "userIO": 0x1a,                         # 26
+            "somethingAPI": 0x1f}                   # 31
 
-SystemInfoCommands = {"mainApplicationVersion": 0x00,
-                      "bootloaderVersion": 0x01,
-                      "something": 0x06,
-                      "something": 0x13,
-                      "something6": 0x12,
-                      "something7": 0x28} # 40
+SystemInfoCommands = {"mainApplicationVersion": 0x00,   # 00
+                      "bootloaderVersion": 0x01,    # 01
+                      "something": 0x06,            # 06
+                      "something2": 0x13,           # 19
+                      "something6": 0x12,           # 18    
+                      "something7": 0x28}           # 40
 
-sendPacketConstants = {"StartOfPacket": 0x8D,
-                       "EndOfPacket": 0xD8}
+sendPacketConstants = {"StartOfPacket": 0x8D,       # 141
+                       "EndOfPacket": 0xD8}         # 216
 
-userIOCommandIDs = {"allLEDs": 0x0e} # 14
+userIOCommandIDs = {"allLEDs": 0x0e}                # 14
 
-flags= {"isResponse": 1,
-        "requestsResponse": 2,
-        "requestsOnlyErrorResponse": 4,
-        "resetsInactivityTimeout": 8}
+flags= {"isResponse": 0x01,                         # 0x01
+        "requestsResponse": 0x02,                   # 0x02
+        "requestsOnlyErrorResponse": 0x04,          # 0x04
+        "resetsInactivityTimeout": 0x08}            # 0x08
 
-powerCommandIDs={"deepSleep": 0x00,
-                "sleep": 0x01,
-                "batteryVoltage": 0x03,
-                "wake": 0x0D,           #13
-                "something2": 0x10,
-                "something3": 0x04,
-                "something4": 0x1E}
+powerCommandIDs={"deepSleep": 0x00,                 # 0
+                "sleep": 0x01,                      # 01
+                "batteryVoltage": 0x03,             # 03
+                "wake": 0x0D,                       # 13
+                "something": 0x05,                  # 05 
+                "something2": 0x10,                 # 16         
+                "something3": 0x04,                 # 04
+                "something4": 0x1E}                 # 30
 
-drivingCommands={"rawMotor": 0x01,
-                 "resetHeading": 0x06,
-                 "driveAsSphero": 0x04,
-                 "driveAsRc": 0x02,
-                 "driveWithHeading": 0x07,
-                 "stabilization": 0x0C}
+drivingCommands={"rawMotor": 0x01,                  # 1
+                 "resetHeading": 0x06,              # 6    
+                 "driveAsSphero": 0x04,             # 4
+                 "driveAsRc": 0x02,                 # 2
+                 "driveWithHeading": 0x07,          # 7
+                 "stabilization": 0x0C}             # 12
 
-'''
-TO DO: Incorporate info from igbopie's javascript lib:
-
-Animatronics: # Not sure if these all apply to the mini - some might apply to the BB9, etc
-    animationBundle = 5
-    shoulderAction = 13
-    domePosition = 15
-    shoulderActionComplete = 38
-    enableShoulderActionCompleteAsync = 42
-
-Sensor Commands:
-    sensorMask = 0
-    sensorResponse = 2
-    configureCollision = 0x11         # 17
-    collisionDetectedAsync = 18
-    resetLocator = 19
-    enableCollisionAsync = 20
-    sensor1 = 0x0F,                   # 15
-    sensor2 = 23
-    configureSensorStream = 0x0C      # 12
-'''
+sensorCommands={'sensorMask': 0x00,                 # 00
+                'sensorResponse': 0x02,             # 02
+                'configureCollision': 0x11,         # 17
+                'collisionDetectedAsync': 0x12,     # 18
+                'resetLocator': 0x13,               # 19
+                'enableCollisionAsync': 0x14,       # 20
+                'sensor1': 0x0F,                    # 15
+                'sensor2': 0x17,                    # 23
+                'configureSensorStream': 0x0C}      # 12
