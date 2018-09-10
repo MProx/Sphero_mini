@@ -17,7 +17,8 @@ sphero = sphero_mini.sphero_mini(MAC)
 sphero.getBatteryVoltage()
 sphero.wait(0.1)
 
-# Return firmware version number
+# Get firmware version number
+# (Printed to the console screen as a notification)
 sphero.returnMainApplicationVersion()
 sphero.wait(0.1)
 
@@ -25,10 +26,7 @@ sphero.wait(0.1)
 sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn main LED off
 sphero.stabilization(False) # Turn off stabilization
 sphero.setBackLEDIntensity(255) # turn back LED on
-
-# Non-blocking pause, keep listening for asynchronous bluetooth notifications
-sphero.wait(3)
-
+sphero.wait(3) # Non-blocking pause
 sphero.resetHeading() # Reset heading
 sphero.stabilization(True) # Turn on stabilization
 sphero.setBackLEDIntensity(0) # Turn back LED off
