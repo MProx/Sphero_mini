@@ -43,12 +43,11 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Detect collisions and produce as-yet partially-parsed collision detection information
 * Return un-parsed sensor data (from all sensors) and display it on the console screen. Example output:
 
-    1126040543980291845585399799275653923201955500894
-    475230771193920660464026295803746961480564251780
-    373480289031629483274603252027886583861619413251
-    350557861046320592069853442054633908532194215389
-    357721051403455528023241278566341852345862299969
-
+> 1126040543980291845585399799275653923201955500894
+> 475230771193920660464026295803746961480564251780
+> 373480289031629483274603252027886583861619413251
+> 350557861046320592069853442054633908532194215389
+> 357721051403455528023241278566341852345862299969
 
 ## Current areas of development:
 * The collision detection function works, but the reurned data is only partially parsed. Configure by calling 'sphero.configureCollisionDetection()', which sets the default thresholds. When a collision that exceeds the threshold is detected, an asynchronous bluetooth notification is received and the results will be displayed on the console with the suspected values of what the numbers represent. Note that the X/Y axis threshold values seem to work, but the speed scaling values seem to have no effect.
