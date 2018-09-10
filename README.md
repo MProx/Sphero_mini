@@ -41,7 +41,7 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Roll in a specified direction at a given speed
 * Go back to sleep (or deep sleep)
 * Detect collisions and produce as-yet partially-parsed collision detection information
-* Return un-parsed sensor data (from all sensors) and display it on the console screen. This sensor data comes out as a long string of numbers. Example:
+* Return un-parsed sensor data (from all sensors) and display it on the console screen. Example output:
 
     1126040543980291845585399799275653923201955500894
     475230771193920660464026295803746961480564251780
