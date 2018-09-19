@@ -33,7 +33,7 @@ where delay is a value in seconds.
 * Sometimes, bluetooth collisions seem to happen, possibly caused by unexpected asynchronous notifications (e.g. collision detection) coming in at a poor time. I have not found a way to prevent them. They cause the program to crash and it needs to be restarted, but they seem to be quite rare.
 
 ## Progress:
-I am actively working on this project, but it is still in it's infancy. For now, this library can only do the following:
+For now, this library can do the following:
 * Come out of sleep mode
 * Reset the heading (aiming)
 * Query the battery voltage
