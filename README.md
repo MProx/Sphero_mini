@@ -42,4 +42,4 @@ I am actively working on this project, but it is still in it's infancy. For now,
 * Roll in a specified direction at a given speed
 * Go back to sleep (or deep sleep)
 * Experimental: Detect collisions and produce partially-parsed collision detection information. Can also set a collision callback function to execute on collision (this is buggy - often crashes)
-*  Experimental: Receive sensor data save it as a class attribute. Currently available sensors: device orientation angles (IMU_pitch, IMU_roll, IMU_yaw), accelerometer values (IMU_acc_x, IMU_acc_y IMU_acc_z), and gyroscope values (IMU_gyro_x, IMU_gyro_y, IMU_gyro_z). Position and velocity are unavailable at this time, but should be added soon.
+*  Experimental: Receive sensor data and save it as a class attribute. Currently available sensors: device orientation angles (IMU_pitch, IMU_roll, IMU_yaw), accelerometer values (IMU_acc_x, IMU_acc_y IMU_acc_z), and gyroscope values (IMU_gyro_x, IMU_gyro_y, IMU_gyro_z). Position and velocity are unavailable at this time, but should be added soon.
