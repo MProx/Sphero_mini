@@ -1,6 +1,11 @@
 import sphero_mini
 import sys
 
+def collision_callback():
+    sphero.setLEDColor(red = 255, green = 0, blue = 0) # Turn LEDs red
+    sphero.wait(2.0)
+    sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn LEDs red
+
 if len(sys.argv) < 2:
     print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
     print("eg f2:54:32:9d:68:a4")
@@ -10,23 +15,21 @@ if len(sys.argv) < 2:
 MAC = sys.argv[1] # Get MAC address from command line argument
 
 # Connect:
-sphero = sphero_mini.sphero_mini(MAC)
+sphero = sphero_mini.sphero_mini(MAC, verbosity = 1)
 
 # Sends instruction to return battery voltage
 # (Printed to the console screen as a notification)
 sphero.getBatteryVoltage()
-sphero.wait(0.1)
 
 # Get firmware version number
 # (Printed to the console screen as a notification)
 sphero.returnMainApplicationVersion()
-sphero.wait(0.1)
 
 # Aiming:
 sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn main LED off
 sphero.stabilization(False) # Turn off stabilization
 sphero.setBackLEDIntensity(255) # turn back LED on
-sphero.wait(3) # Non-blocking pause
+sphero.wait(3) # Non-blocking pau`se
 sphero.resetHeading() # Reset heading
 sphero.stabilization(True) # Turn on stabilization
 sphero.setBackLEDIntensity(0) # Turn back LED off

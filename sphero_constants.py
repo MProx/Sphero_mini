@@ -35,8 +35,8 @@ SystemInfoCommands = {"mainApplicationVersion": 0x00,   # 00
                       "something6": 0x12,           # 18    
                       "something7": 0x28}           # 40
 
-sendPacketConstants = {"StartOfPacket": 0x8D,       # 141
-                       "EndOfPacket": 0xD8}         # 216
+sendPacketConstants = {"StartOfPacket": 0x8d,       # 141
+                       "EndOfPacket": 0xd8}         # 216
 
 userIOCommandIDs = {"allLEDs": 0x0e}                # 14
 
