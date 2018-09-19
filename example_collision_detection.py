@@ -26,7 +26,7 @@ sphero.getBatteryVoltage()
 sphero.returnMainApplicationVersion()
 
 # Note: Collision detection is an experimental feature - sometimes crashes, with "unexpected response" from bluetooth module
-sphero.configureCollisionDetection(callback=collision_callback) # pass function object as callback
+sphero.configureCollisionDetection(callback=collision_callback) # Use default thresholds and pass function object as callback
 
 sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn LEDs green
 print('Waiting for collision')
