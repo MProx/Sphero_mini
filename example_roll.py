@@ -1,11 +1,6 @@
 import sphero_mini
 import sys
 
-def collision_callback():
-    sphero.setLEDColor(red = 255, green = 0, blue = 0) # Turn LEDs red
-    sphero.wait(2.0)
-    sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn LEDs red
-
 if len(sys.argv) < 2:
     print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
     print("eg f2:54:32:9d:68:a4")
