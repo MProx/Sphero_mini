@@ -19,7 +19,7 @@ As examples demonstrating basic usage, see the three example files included in t
 
 On Linux, use 'sudo hcitool lescan' to find your Sphero Mini's MAC address.
 
-Note on usage: If you need to use delays, you can use time.sleep(), but this is a blocking function. Any asynchronous notifications that come in during the delay period can only be processed when it ends. If you need asynchronous commands (e.g. collision detection) to be processed immediately, use the provided convenience function:
+Note on usage: If you need to use delays, you can use time.sleep(), but this is a blocking function. Any asynchronous notifications that come in during the delay period can only be processed when it ends. If you need asynchronous commands (e.g. collision detection or sensor value updates) to be processed immediately, use the provided convenience function:
 
 > sphero.wait(delay)
 
