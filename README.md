@@ -31,6 +31,7 @@ where delay is a value in seconds.
 * If it keeps failing after that, try re-booting your computer. I find that, expecially after terminating a script with a keyboard interrupt (ctrl+C), the bluetooth module may struggle to reconnect afterwards
 * The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on things like command acknowledgements, battery voltage reporting, etc. 
 * Sometimes, bluetooth collisions seem to happen, possibly caused by unexpected asynchronous notifications (e.g. collision detection) coming in at a poor time. I have not found a way to prevent them. They cause the program to crash and it needs to be restarted, but they seem to be quite rare.
+* When issuing the "roll" command, the device rolls in a given direction at a given speed, but automatically stops after a few seconds. Keep issuing the command to continue rolling.
 
 ## Progress:
 For now, this library can do the following:
