@@ -5,7 +5,7 @@ import struct
 import time
 
 class sphero_mini():
-    def __init__(self, MACAddr, verbosity = 4):
+    def __init__(self, MACAddr, verbosity = 4, user_delegate = None):
         '''
         initialize class instance and then build collect BLE sevices and characteristics.
         Also sends text string to Anti-DOS characteristic to prevent returning to sleep,
@@ -27,7 +27,7 @@ class sphero_mini():
             print("Initializing... ")
 
         # Subscribe to notifications
-        self.sphero_delegate = MyDelegate(self) # Pass a reference to this instance when initializing
+        self.sphero_delegate = MyDelegate(self, user_delegate) # Pass a reference to this instance when initializing
         self.p.setDelegate(self.sphero_delegate)
 
         if self.verbosity > 1:
@@ -255,6 +255,10 @@ class sphero_mini():
         - End byte: always 0xD8
 
         '''
+        self.sequence += 1 # Increment sequence number, ensures we can identify response packets are for this command
+        if self.sequence > 255:
+            self.sequence = 0
+
         sendBytes = [sendPacketConstants["StartOfPacket"],
                     sum([flags["resetsInactivityTimeout"], flags["requestsResponse"]]),
                     devID,
@@ -278,19 +282,23 @@ class sphero_mini():
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
 
-        self.sequence += 1 # Increment sequence number (not sure that this is necessary, but probably good practice)
-        if self.sequence > 255:
-            self.sequence = 0
-
     def getAcknowledgement(self, ack):
-        #wait for correct acknowledgement to come in
+        #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
+        start = time.time()
         while(1):
             self.p.waitForNotifications(1)
-            if self.sphero_delegate.notification_ack.split()[0] == ack:
+            if self.sphero_delegate.notification_seq == self.sequence:
                 if (ack == 'Battery') or (ack == 'Firmware') or (self.verbosity > 3):
                     print("\t" + self.sphero_delegate.notification_ack)
-            # else:
-            #     print("Unexpected ACK. Expected: {}, received: {}".format(ack, self.sphero_delegate.notification_ack.split()[0]))
+                self.sphero_delegate.clear_notification()
+                break
+            elif self.sphero_delegate.notification_seq >= 0:
+                print("Unexpected ACK. Expected: {}/{}, received: {}/{}".format(
+                    ack, self.sequence, self.sphero_delegate.notification_ack.split()[0],
+                    self.sphero_delegate.notification_seq),
+                    file=sys.stderr)
+            if time.time() > start + 10:
+                print("Timeout waiting for acknowledgement: {}/{}".format(ack, self.sequence), file=sys.stderr)
                 break
 
 # =======================================================================
@@ -457,11 +465,16 @@ class MyDelegate(btle.DefaultDelegate):
     
     '''
 
-    def __init__(self, sphero_class):
+    def __init__(self, sphero_class, user_delegate):
         self.sphero_class = sphero_class # for saving sensor values as attributes of sphero class instance
+        self.user_delegate = user_delegate # to directly notify users of callbacks
         btle.DefaultDelegate.__init__(self)
-        self.notification_ack = "DEFAULT ACK"
+        self.clear_notification()
         self.notificationPacket = []
+
+    def clear_notification(self):
+        self.notification_ack = "DEFAULT ACK"
+        self.notification_seq = -1
 
     def bits_to_num(self, bits):
         '''
@@ -483,6 +496,11 @@ class MyDelegate(btle.DefaultDelegate):
         encountered. Note that this is an issue, because 0xD8 could be sent as part of the payload of,
         say, the battery voltage notification. In future, a more sophisticated method will be required.
         '''
+        # Allow the user to intercept and process data first..
+        if self.user_delegate != None:
+            if self.user_delegate.handleNotification(cHandle, data):
+                return
+
         for data_byte in data: # parse each byte separately (sometimes they arrive simultaneously)
 
             self.notificationPacket.append(data_byte) # Add new byte to packet list
@@ -496,6 +514,7 @@ class MyDelegate(btle.DefaultDelegate):
                 try:
                     start, flags_bits, devid, commcode, seq, *notification_payload, chsum, end = self.notificationPacket
                 except ValueError:
+                    print("Warning: notification packet unparseable", self.notificationPacket, file=sys.stderr)
                     self.notificationPacket = [] # Discard this packet
                     return # exit
 
@@ -510,7 +529,7 @@ class MyDelegate(btle.DefaultDelegate):
                     checksum = (checksum + num) & 0xFF # bitwise "and to get modulo 256 sum of appropriate bytes
                 checksum = 0xff - checksum # bitwise 'not' to invert checksum bits
                 if checksum != chsum: # check computed checksum against that recieved in the packet
-                    # print("Warning: notification packet checksum failed", self.notificationPacket)
+                    print("Warning: notification packet checksum failed", self.notificationPacket, file=sys.stderr)
                     self.notificationPacket = [] # Discard this packet
                     return # exit
 
@@ -562,6 +581,8 @@ class MyDelegate(btle.DefaultDelegate):
                     else:
                         self.notification_ack = "Unknown acknowledgement" #print(self.notificationPacket)
                         print(self.notificationPacket, "===================> Unknown ack packet")
+
+                    self.notification_seq = seq
 
                 else: # Not a response packet - therefore, asynchronous notification (e.g. collision detection, etc):
                     
