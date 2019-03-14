@@ -4,7 +4,7 @@ import sys
 def collision_callback():
     sphero.setLEDColor(red = 255, green = 0, blue = 0) # Turn LEDs red
     sphero.wait(2.0)
-    sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn LEDs red
+    sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn LEDs green
 
 if len(sys.argv) < 2:
     print("Usage: 'python [this_file_name.py] [sphero MAC address]'")
