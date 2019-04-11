@@ -1,8 +1,9 @@
-from bluepy.btle import *
+from bluepy.btle import Peripheral
 from bluepy import btle
 from sphero_constants import *
 import struct
 import time
+import sys
 
 class sphero_mini():
     def __init__(self, MACAddr, verbosity = 4, user_delegate = None):
@@ -12,26 +13,28 @@ class sphero_mini():
         and initializes notifications (which is what the sphero uses to send data back to
         the client).
         '''
-        self.sequence = 0
         self.verbosity = verbosity # 0 = Silent,
                                    # 1 = Connection/disconnection only
                                    # 2 = Init messages
                                    # 3 = Recieved commands
                                    # 4 = Acknowledgements
+        self.sequence = 1
+        self.v_batt = None # will be updated with battery voltage when sphero.getBatteryVoltage() is called
+        self.firmware_version = [] # will be updated with firware version when sphero.returnMainApplicationVersion() is called
 
         if self.verbosity > 0:
-            print("Connecting to", MACAddr)
+            print("[INFO] Connecting to", MACAddr)
         self.p = Peripheral(MACAddr, "random") #connect
 
         if self.verbosity > 1:
-            print("Initializing... ")
+            print("[INIT] Initializing")
 
         # Subscribe to notifications
         self.sphero_delegate = MyDelegate(self, user_delegate) # Pass a reference to this instance when initializing
         self.p.setDelegate(self.sphero_delegate)
 
         if self.verbosity > 1:
-            print(" - Read all characteristics and descriptors")
+            print("[INIT] Read all characteristics and descriptors")
         # Get characteristics and descriptors
         self.API_V2_characteristic = self.p.getCharacteristics(uuid="00010002-574f-4f20-5370-6865726f2121")[0]
         self.AntiDOS_characteristic = self.p.getCharacteristics(uuid="00020005-574f-4f20-5370-6865726f2121")[0]
@@ -43,33 +46,33 @@ class sphero_mini():
         # The rest of this sequence was observed during bluetooth sniffing:
         # Unlock code: prevent the sphero mini from going to sleep again after 10 seconds
         if self.verbosity > 1:
-            print(" - Writing AntiDOS characteristic unlock code")
+            print("[INIT] Writing AntiDOS characteristic unlock code")
         self.AntiDOS_characteristic.write("usetheforce...band".encode(), withResponse=True)
 
         # Enable DFU notifications:
         if self.verbosity > 1:
-            print(" - Configuring DFU descriptor")
+            print("[INIT] Configuring DFU descriptor")
         self.DFU_descriptor.write(struct.pack('<bb', 0x01, 0x00), withResponse = True)
 
         # No idea what this is for. Possibly a device ID of sorts? Read request returns '00 00 09 00 0c 00 02 02':
         if self.verbosity > 1:
-            print(" - Reading DFU2 characteristic")
+            print("[INIT] Reading DFU2 characteristic")
         _ = self.DFU2_characteristic.read()
 
         # Enable API notifications:
         if self.verbosity > 1:
-            print(" - Configuring API dectriptor")
+            print("[INIT] Configuring API dectriptor")
         self.API_descriptor.write(struct.pack('<bb', 0x01, 0x00), withResponse = True)
 
         self.wake()
 
         # Finished initializing:
         if self.verbosity > 1:
-            print("Initialization complete\n")
+            print("[INIT] Initialization complete\n")
 
     def disconnect(self):
         if self.verbosity > 0:
-            print("Disconnecting")
+            print("[INFO] Disconnecting")
         
         self.p.disconnect()
 
@@ -79,7 +82,7 @@ class sphero_mini():
         If in deep sleep, the device should be connected to USB power to wake.
         '''
         if self.verbosity > 2:
-            print(" - Waking...")
+            print("[SEND {}] Waking".format(self.sequence))
         
         self._send(characteristic=self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
@@ -107,7 +110,7 @@ class sphero_mini():
         Set device LED color based on RGB vales (each can  range between 0 and 0xFF)
         '''
         if self.verbosity > 2:
-            print("Setting main LED colour to [{}, {}, {}]".format(red, green, blue))
+            print("[SEND {}] Setting main LED colour to [{}, {}, {}]".format(self.sequence, red, green, blue))
         
         self._send(characteristic = self.API_V2_characteristic,
                   devID = deviceID['userIO'], # 0x1a
@@ -123,7 +126,7 @@ class sphero_mini():
         NOTE: this is not the same as aiming - it only turns on the LED
         '''
         if self.verbosity > 2:
-            print("Setting backlight intensity to {}".format(brightness))
+            print("[SEND {}] Setting backlight intensity to {}".format(self.sequence, brightness))
 
         self._send(characteristic = self.API_V2_characteristic,
                   devID = deviceID['userIO'],
@@ -142,7 +145,7 @@ class sphero_mini():
         seem that the sphero doesn't honor the heading argument
         '''
         if self.verbosity > 2:
-            print("Rolling with speed {} and heading {}".format(speed, heading))
+            print("[SEND {}] Rolling with speed {} and heading {}".format(self.sequence, speed, heading))
     
         if abs(speed) > 255:
             print("WARNING: roll speed parameter outside of allowed range (-255 to +255)")
@@ -168,7 +171,7 @@ class sphero_mini():
         Once the heading has been set, call stabilization(True).
         '''
         if self.verbosity > 2:
-            print("Resetting heading")
+            print("[SEND {}] Resetting heading".format(self.sequence))
     
         self._send(characteristic = self.API_V2_characteristic,
                   devID = deviceID['driving'],
@@ -182,7 +185,7 @@ class sphero_mini():
         Sends command to return application data in a notification
         '''
         if self.verbosity > 2:
-            print("Requesting firmware version...")
+            print("[SEND {}] Requesting firmware version".format(self.sequence))
     
         self._send(self.API_V2_characteristic,
                    devID = deviceID['systemInfo'],
@@ -197,7 +200,7 @@ class sphero_mini():
         Data printed to console screen by the handleNotifications() method in the MyDelegate class.
         '''
         if self.verbosity > 2:
-            print("Requesting battery voltage...", )
+            print("[SEND {}] Requesting battery voltage".format(self.sequence))
     
         self._send(self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
@@ -212,11 +215,11 @@ class sphero_mini():
         '''
         if stab == True:
             if self.verbosity > 2:
-                    print("Enabling stabilization... ")
+                    print("[SEND {}] Enabling stabilization".format(self.sequence))
             val = 1
         else:
             if self.verbosity > 2:
-                    print("Disabling stabilization... ")
+                    print("[SEND {}] Disabling stabilization".format(self.sequence))
             val = 0
         self._send(self.API_V2_characteristic,
                    devID=deviceID['driving'],
@@ -255,15 +258,15 @@ class sphero_mini():
         - End byte: always 0xD8
 
         '''
-        self.sequence += 1 # Increment sequence number, ensures we can identify response packets are for this command
-        if self.sequence > 255:
-            self.sequence = 0
-
         sendBytes = [sendPacketConstants["StartOfPacket"],
                     sum([flags["resetsInactivityTimeout"], flags["requestsResponse"]]),
                     devID,
                     commID,
                     self.sequence] + payload # concatenate payload list
+
+        self.sequence += 1 # Increment sequence number, ensures we can identify response packets are for this command
+        if self.sequence > 255:
+            self.sequence = 0
 
         # Compute and append checksum and add EOP byte:
         # From Sphero docs: "The [checksum is the] modulo 256 sum of all the bytes
@@ -287,9 +290,9 @@ class sphero_mini():
         start = time.time()
         while(1):
             self.p.waitForNotifications(1)
-            if self.sphero_delegate.notification_seq == self.sequence:
-                if (ack == 'Battery') or (ack == 'Firmware') or (self.verbosity > 3):
-                    print("\t" + self.sphero_delegate.notification_ack)
+            if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
+                if self.verbosity > 3:
+                    print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
                 self.sphero_delegate.clear_notification()
                 break
             elif self.sphero_delegate.notification_seq >= 0:
@@ -331,7 +334,7 @@ class sphero_mini():
         '''
         
         if self.verbosity > 2:
-            print("Configuring collision detection")
+            print("[SEND {}] Configuring collision detection".format(self.sequence))
     
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -355,7 +358,7 @@ class sphero_mini():
         bitfield4 = 0b00000000 # Unknown function - needs experimenting
 
         if self.verbosity > 2:
-            print("Configuring sensor stream")
+            print("[SEND {}] Configuring sensor stream".format(self.sequence))
     
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -396,7 +399,7 @@ class sphero_mini():
                          (IMU_gyro_y<<4) + (IMU_gyro_x<<2) + (IMU_gyro_z<<2))
         
         if self.verbosity > 2:
-            print("Configuring sensor mask")
+            print("[SEND {}] Configuring sensor mask".format(self.sequence))
     
         self._send(self.API_V2_characteristic,
                    devID=deviceID['sensor'],
@@ -571,12 +574,12 @@ class MyDelegate(btle.DefaultDelegate):
                         V_batt = notification_payload[2] + notification_payload[1]*256 + notification_payload[0]*65536
                         V_batt /= 100 # Notification gives V_batt in 10mV increments. Divide by 100 to get to volts.
                         self.notification_ack = "Battery voltage:" + str(V_batt) + "v"
+                        self.sphero_class.v_batt = V_batt
 
                     elif devid == deviceID['systemInfo'] and commcode == SystemInfoCommands['mainApplicationVersion']:
-                        version = str(notification_payload[0])
-                        for byte in notification_payload[1:]:
-                            version += "." + str(byte)
+                        version = '.'.join(str(x) for x in notification_payload)
                         self.notification_ack = "Firmware version: " + version
+                        self.sphero_class.firmware_version = notification_payload
                                                 
                     else:
                         self.notification_ack = "Unknown acknowledgement" #print(self.notificationPacket)
