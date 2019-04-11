@@ -12,13 +12,11 @@ MAC = sys.argv[1] # Get MAC address from command line argument
 # Connect:
 sphero = sphero_mini.sphero_mini(MAC, verbosity = 1)
 
-# Sends instruction to return battery voltage
-# (Printed to the console screen as a notification)
+# battery voltage
 sphero.getBatteryVoltage()
 print(f"Bettery voltage: {sphero.v_batt}v")
 
-# Get firmware version number
-# (Printed to the console screen as a notification)
+# firmware version number
 sphero.returnMainApplicationVersion()
 print(f"Firmware version: {'.'.join(str(x) for x in sphero.firmware_version)}")
 
