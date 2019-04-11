@@ -32,6 +32,7 @@ where delay is a value in seconds.
 * The notifications (messages returned from the sphero to the client) are a little experimental right now. Messages may not come through, or may not come through immediately. Do not rely on things like command acknowledgements, battery voltage reporting, etc. 
 * Sometimes, bluetooth collisions seem to happen, possibly caused by unexpected asynchronous notifications (e.g. collision detection) coming in at a poor time. I have not found a way to prevent them. They cause the program to crash and it needs to be restarted, but they seem to be quite rare.
 * When issuing the "roll" command, the device rolls in a given direction at a given speed, but automatically stops after a few seconds. Keep issuing the command to continue rolling.
+* Some functions (sensors, collision detection, etc) may not function correctly on older firmware versions. This library is tested with version 0.0.12.0.45.0.0. Test your version with the sphero.getFirmwareVersion() function (see examples), and update with the official Sphero Mini app if necessary.
 
 ## Progress:
 For now, this library can do the following:
