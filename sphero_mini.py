@@ -97,7 +97,8 @@ class sphero_mini():
         '''
         if deepSleep:
             sleepCommID=powerCommandIDs["deepSleep"]
-            print("Going into deep sleep. Connect power to wake.")
+            if self.verbosity > 0:
+                print("[INFO] Going into deep sleep. Connect USB power to wake.")
         else:
             sleepCommID=powerCommandIDs["sleep"]
         self._send(characteristic=self.API_V2_characteristic,
