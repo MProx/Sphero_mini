@@ -19,11 +19,11 @@ sphero = sphero_mini.sphero_mini(MAC, verbosity = 1)
 
 # battery voltage
 sphero.getBatteryVoltage()
-print(f"Bettery voltage: {sphero.v_batt}v")
+print("Battery voltage: " + str(sphero.v_batt) + " V")
 
 # firmware version number
 sphero.returnMainApplicationVersion()
-print(f"Firmware version: {'.'.join(str(x) for x in sphero.firmware_version)}")
+print("Firmware version: " + '.'.join(str(x) for x in sphero.firmware_version))
 
 # Note: Collision detection is an experimental feature - sometimes crashes, with "unexpected response" from bluetooth module
 sphero.configureCollisionDetection(callback=collision_callback) # Use default thresholds and pass function object as callback
