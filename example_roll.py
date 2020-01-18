@@ -14,11 +14,11 @@ sphero = sphero_mini.sphero_mini(MAC, verbosity = 1)
 
 # battery voltage
 sphero.getBatteryVoltage()
-print(f"Bettery voltage: {sphero.v_batt}v")
+print("Battery voltage: " + str(sphero.v_batt) + " V")
 
 # firmware version number
 sphero.returnMainApplicationVersion()
-print(f"Firmware version: {'.'.join(str(x) for x in sphero.firmware_version)}")
+print("Firmware version: " + '.'.join(str(x) for x in sphero.firmware_version))
 
 # Aiming:
 sphero.setLEDColor(red = 0, green = 0, blue = 0) # Turn main LED off
