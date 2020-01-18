@@ -1,8 +1,18 @@
 import sphero_mini
 import sys
 
+angle = 0
+
 def collision_callback():
+    global angle
     sphero.setLEDColor(red = 255, green = 0, blue = 0) # Turn LEDs red
+
+    # turn 90 degrees
+    angle += 90
+    if angle >= 360:
+        angle = 0
+    sphero.roll(100, angle)
+
     sphero.wait(2.0)
     sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn LEDs green
 
@@ -31,5 +41,8 @@ sphero.configureCollisionDetection(callback=collision_callback) # Use default th
 sphero.setLEDColor(red = 0, green = 255, blue = 0) # Turn LEDs green
 print('Waiting for collision')
 
+
 while(1):
-    sphero.wait(1)
+    sphero.roll(100, angle)      # roll forwards (heading = 0) at speed = 50
+
+    sphero.wait(3)         # Keep rolling for three seconds
