@@ -184,8 +184,7 @@ class SpheroVectorController(object):
         Helper method: handle updates to sphero
         """
         self._update_heading()
-        speed = min([self._vector.magnitude, 255])
-        print("Speed: ", speed)
+        speed = int(min([self._vector.magnitude, 255]))
         direction = self.host_to_device_angle(self._heading.angle)
         if self._should_update(speed, direction):
             if self.device:
