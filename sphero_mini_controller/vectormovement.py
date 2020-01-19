@@ -188,12 +188,11 @@ class SpheroVectorController(object):
         direction = self.host_to_device_angle(self._heading.angle)
         if self._should_update(speed, direction):
             if self.device:
-                if self.device.connected():
                 # TODO catch all exceptions from sphero and handle them!!!
                     #print "ROLL CMD", speed, direction
-                    self.device.roll(speed, direction)
-                    self._last_speed = speed
-                    self._last_direction = direction
+                self.device.roll(speed, direction)
+                self._last_speed = speed
+                self._last_direction = direction
 
                 #self._last_vector = self._vector.copy()
 
