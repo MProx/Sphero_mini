@@ -61,7 +61,7 @@ class SpheroMiniPS4Controls(object):
         :param device:
         :type device: sphero_mini
         """
-        # print ("NEW Sphero: ", device.bt_name)
+        print ("NEW Sphero")
 
         # if device.connect():
         controllable_sphero = ControllableSphero(device)
