@@ -11,7 +11,7 @@ class SpheroMiniPS4Controls(object):
         super(SpheroMiniPS4Controls, self).__init__()
         self._ps4_manager = manager.PS4manager()
 
-        self._tracker = trackerbase.ColorTracker()
+        # self._tracker = trackerbase.ColorTracker()
 
         self._controllable_devices = []
 
@@ -75,7 +75,7 @@ class SpheroMiniPS4Controls(object):
         else:
             print ("No free PS4 controller available")
 
-        self.set_tracking_filter(controllable_sphero, device)
+        # self.set_tracking_filter(controllable_sphero, device)
 
         self._controllable_devices.append(controllable_sphero)
         print( "Controls successfully setup")
