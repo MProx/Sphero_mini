@@ -185,7 +185,7 @@ class SpheroVectorController(object):
         """
         self._update_heading()
         speed = int(min([self._vector.magnitude, 255]))
-        direction = self.host_to_device_angle(self._heading.angle)
+        direction = int(self.host_to_device_angle(self._heading.angle))
         if self._should_update(speed, direction):
             if self.device:
                 # TODO catch all exceptions from sphero and handle them!!!
