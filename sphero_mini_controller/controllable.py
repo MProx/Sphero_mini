@@ -4,7 +4,7 @@ from functools import wraps
 from threading import Thread
 import time
 import math
-import vectormovement
+from .vectormovement import *
 from .tracablesphero import TraceableSphero
 import ps4_controller
 from sphero_mini import sphero_mini
@@ -31,7 +31,7 @@ class ControllableSphero(TraceableSphero):
         self._ps4_controller = None
 
         # MOVEMENT CONTROL
-        self.vector_control = vectormovement.SpheroVectorController(self.device)
+        self.vector_control = SpheroVectorController(self.device)
         self.vector_control.start()
         self._motion_timeout = 5000
 
