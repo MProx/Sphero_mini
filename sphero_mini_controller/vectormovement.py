@@ -30,13 +30,13 @@ class SpheroVectorController(object):
         self._time_delta = 1.0 / DEFAULT_UPDATE_RATE
 
         # MOVEMENT
-        self._vector = Vector2D(0, 0)
+        self._vector = vector.Vector2D(0, 0)
         self._last_vector = self._vector.copy()
 
         self.turn_rate = 0.0
 
         # Keep track of last heading if speed vector is zero
-        self._heading = Vector2D(1.0, 0)
+        self._heading = vector.Vector2D(1.0, 0)
         self._heading.angle = self._vector.angle
 
         self._last_direction = 0.0
