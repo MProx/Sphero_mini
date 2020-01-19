@@ -1,6 +1,6 @@
 from threading import Thread
 import time
-import util
+from util import vector
 
 DEFAULT_UPDATE_RATE = 50.0
 
