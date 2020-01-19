@@ -28,7 +28,7 @@ class ControllableSphero(TraceableSphero):
 
         self.is_calibrating = False
         self.device = device
-        self.filter = FilterSpheroBlueCover()
+        # self.filter = FilterSpheroBlueCover()
         self._ps4_controller = None
 
         # MOVEMENT CONTROL
@@ -40,7 +40,7 @@ class ControllableSphero(TraceableSphero):
         self._cmd_retries = 5
 
         # SENSOR STREAMING
-        self._ssc = SensorStreamingConfig()
+        # self._ssc = SensorStreamingConfig()
 
         # COLLISION DETECTION
         self.collision_data = None
