@@ -10,7 +10,7 @@ from .tracablesphero import TraceableSphero
 import ps4_controller
 from sphero_mini import sphero_mini
 from util import vector
-from tracker import ImageGraphics as Ig, DrawError, FilterSpheroBlueCover
+from tracker import *
 import util
 
 

@@ -1,16 +1,17 @@
 import time
 from .controllable import ControllableSphero
-import ps4
+from ps4_controller import manager
 #import tracker
 from sphero_mini import sphero_mini
+from tracker import trackerbase
 
 
 class SpheroMiniPS4Controls(object):
     def __init__(self):
-        super(SpheroPS4Controls, self).__init__()
-        self._ps4_manager = ps4.PS4manager()
+        super(SpheroMiniPS4Controls, self).__init__()
+        self._ps4_manager = manager.PS4manager()
 
-        self._tracker = tracker.ColorTracker()
+        self._tracker = trackerbase.ColorTracker()
 
         self._controllable_devices = []
 

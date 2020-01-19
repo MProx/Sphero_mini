@@ -1,13 +1,11 @@
 import time
+from tracker import traceable
 import sphero_mini
-from tracker import TraceableObject, FilterGlow
-from tracker import ImageGraphics as Ig
-from tracker.graphics import DrawError
 from util.vector import Vector2D
 from util.color import Color
 
 
-class TraceableSphero(TraceableObject):
+class TraceableSphero(traceable.TraceableObject):
     """
     A helper class for tracking spheros
     """
