@@ -1,8 +1,6 @@
 import time
 import sphero_mini
-from tracker import TraceableObject, FilterGlow
-from tracker import ImageGraphics as Ig
-from tracker.graphics import DrawError
+from tracker import graphics, trackerbase
 from util.vector import Vector2D
 from util.color import Color
 
