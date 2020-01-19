@@ -10,8 +10,6 @@ import ps4_controller
 from sphero_mini import sphero_mini
 from util import vector
 from tracker import *
-import util
-
 
 class ControllableSphero(TraceableSphero):
     """
@@ -52,7 +50,7 @@ class ControllableSphero(TraceableSphero):
         self.dot_draw_radius = 2
         self.is_inside_dot = False
         self.inside_dot_threshold = 15
-        self.dot_pos = Vector2D(10, 10)
+        self.dot_pos = vector.Vector2D(10, 10)
         self.dot_drive = False
         self.dot_speed_y = 0.0
         self.dot_speed_x = 0.0
@@ -229,7 +227,7 @@ class ControllableSphero(TraceableSphero):
         screen_y = self.screen_size[1]
 
         self.vector_control.direction = 45
-        center = Vector2D(screen_x/2, screen_y/2)
+        center = vector.Vector2D(screen_x/2, screen_y/2)
 
         while self._run_bounce:
             self.vector_control.speed = 60
