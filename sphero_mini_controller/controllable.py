@@ -71,7 +71,7 @@ class ControllableSphero(TraceableSphero):
         # )
         # self.device.set_motion_timeout(self._motion_timeout)
         # self.device.set_rgb(0xFF, 0xFF, 0xFF, True)
-        self.device.setLEDColor(0xFF, 0xFF, 0xFF)
+        self.device.setLEDColor(red=255, green=0, blue=0)
 
         # self._configure_sensor_streaming()
 
