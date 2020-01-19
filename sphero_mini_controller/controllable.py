@@ -4,8 +4,7 @@ from functools import wraps
 from threading import Thread
 import time
 import math
-from .vectormovement import *
-
+import vectormovement
 from .tracablesphero import TraceableSphero
 import ps4_controller
 from sphero_mini import sphero_mini
