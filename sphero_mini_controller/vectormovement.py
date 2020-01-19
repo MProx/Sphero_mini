@@ -82,7 +82,7 @@ class SpheroVectorController(object):
         self.vector.angle = value
         self._heading.angle = value
 
-    def host_to_device_angle(host_angle):
+    def host_to_device_angle(self, host_angle):
         """
         Transform from euclidean angle to device angle
         :param host_angle: angle degrees in host format
