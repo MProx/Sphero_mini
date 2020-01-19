@@ -185,7 +185,7 @@ class SpheroVectorController(object):
         """
         self._update_heading()
         speed = min([self._vector.magnitude, 255])
-        direction = host_to_device_angle(self._heading.angle)
+        direction = self.host_to_device_angle(self._heading.angle)
         if self._should_update(speed, direction):
             if self.device:
                 if self.device.connected():
