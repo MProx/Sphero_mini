@@ -24,7 +24,7 @@ class SpheroMiniPS4Controls(object):
         
         # connect to peripheral
         # on_new_sphero
-        sphero = sphero_mini(hwaddr, verbosity = 1)
+        sphero = sphero_mini.sphero_mini(hwaddr, verbosity = 1)
         self.on_new_sphero(sphero)
         while True:
             pass
