@@ -1,6 +1,6 @@
 from threading import Thread
 import time
-from util import vector
+from util import vector, timer
 
 DEFAULT_UPDATE_RATE = 50.0
 
@@ -177,7 +177,7 @@ class SpheroVectorController(object):
             t1 = time.time()
             self._sleep(t0, t1)
             t2 = time.time()
-            self.achieved_fps = util.calc_fps(t0, t2)
+            self.achieved_fps = timer.calc_fps(t0, t2)
 
     def _move_device(self):
         """
