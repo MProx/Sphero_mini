@@ -192,10 +192,10 @@ class ControllableSphero(TraceableSphero):
                 constants.BUTTON_CIRCLE: self.calibrate,
                 constants.BUTTON_SQUARE: self.toggle_lights,
                 constants.BUTTON_CROSS: self.lights_random_color,
-                constants.BUTTON_TRIANGLE: self.ping,
+                constants.BUTTON_TRIANGLE: self.toggle_lights,
 
-                constants.BUTTON_JOY_PAD_UP: self.toggle_bouncing_ball,
-                constants.BUTTON_JOY_PAD_RIGHT: self.toggle_dot_drive
+                constants.BUTTON_JOY_PAD_UP: self.toggle_lights,
+                constants.BUTTON_JOY_PAD_RIGHT: self.toggle_lights
             },
             button_release={
 
@@ -292,15 +292,15 @@ class ControllableSphero(TraceableSphero):
         r = random.randrange(0, 255)
         g = random.randrange(0, 255)
         b = random.randrange(0, 255)
-        print ("Lights random color: ", self.device.set_rgb(r, g, b, True).success)
+        print ("Lights random color: ", self.device.setLEDColor(r, g, b).success)
 
     @handle_exceptions
     def toggle_lights(self):
         if not self.lights:
-            self.device.set_rgb(255, 255, 255, True)
+            self.device.setLEDColor(255, 255, 255)
             self.lights = True
             return
-        self.device.set_rgb(0, 0, 0, True)
+        self.device.setLEDColor(0, 0, 0)
         self.lights = False
 
     @handle_exceptions
