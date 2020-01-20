@@ -13,6 +13,24 @@ class SpheroMiniPS4Controls(object):
 
         # self._tracker = trackerbase.ColorTracker()
 
+        def button_square_cb():
+            print ("Square")
+
+        def button_x_cb():
+            print ("X")
+
+        def button_circle_cb():
+            print ("Circle")
+            
+        def button_triangle_cb():
+            print ("Triangle")
+
+        for controller in self._ps4_manager.controllers():
+            controller.set_button_press_event(constants.BUTTON_CIRCLE, button_circle_cb)
+            controller.set_button_release_event(constants.BUTTON_SQUARE, button_square_cb)
+            controller.set_button_release_event(constants.BUTTON_TRIANGLE, button_triangle_cb)
+            controller.set_button_release_event(constants.BUTTON_CROSS, button_x_cb)
+
         self._controllable_devices = []
 
     #     self._init_sphero_manager()
@@ -64,8 +82,8 @@ class SpheroMiniPS4Controls(object):
         print ("NEW Sphero")
 
         # if device.connect():
-        # controllable_sphero = ControllableSphero(device)
-        # controllable_sphero.set_sphero_disconnected_cb(self.clean_up_sphero_dev)
+        controllable_sphero = ControllableSphero(device)
+        controllable_sphero.set_sphero_disconnected_cb(self.clean_up_sphero_dev)
 
         ps4_ctrl = self._ps4_manager.get_available_controller()
 
