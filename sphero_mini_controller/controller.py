@@ -12,7 +12,7 @@ class SpheroMiniPS4Controls(object):
         super(SpheroMiniPS4Controls, self).__init__()
         self._ps4_manager = manager.PS4manager()
 
-        # self._tracker = trackerbase.ColorTracker()
+        self._tracker = trackerbase.ColorTracker()
 
         self._controllable_devices = []
 
@@ -29,17 +29,17 @@ class SpheroMiniPS4Controls(object):
         self.on_new_sphero(sphero)
         while True:
             pass
-        # while True:
-        #     traceable_objects = []
-        #     for controllable in self._controllable_devices:
-        #         traceable_objects.append(controllable)
+        while True:
+            traceable_objects = []
+            for controllable in self._controllable_devices:
+                traceable_objects.append(controllable)
 
-        #     if len(traceable_objects) > 1:
-        #         if traceable_objects[0].pos:
-        #             traceable_objects[1].dot_pos = traceable_objects[0].pos
+            if len(traceable_objects) > 1:
+                if traceable_objects[0].pos:
+                    traceable_objects[1].dot_pos = traceable_objects[0].pos
 
-        #     self._tracker.track_objects(traceable_objects)
-        #     time.sleep(1.0 / 25.0)
+            self._tracker.track_objects(traceable_objects)
+            time.sleep(1.0 / 25.0)
 
     @staticmethod
     def set_tracking_filter(controllable_sphero, device):
@@ -76,7 +76,7 @@ class SpheroMiniPS4Controls(object):
         else:
             print ("No free PS4 controller available")
 
-        # self.set_tracking_filter(controllable_sphero, device)
+        self.set_tracking_filter(controllable_sphero, device)
 
         self._controllable_devices.append(controllable_sphero)
         self._ps4_manager.start()
