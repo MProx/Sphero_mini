@@ -296,6 +296,7 @@ class ControllableSphero(TraceableSphero):
 
     @handle_exceptions
     def toggle_lights(self):
+        print("Toggle Lights")
         if not self.lights:
             self.device.setLEDColor(255, 255, 255)
             self.lights = True
