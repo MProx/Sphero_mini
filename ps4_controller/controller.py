@@ -58,7 +58,8 @@ class PS4C(object):
         :return: True if this is a PSP controller
         :rtype: bool
         """
-        return ctrl_name == 'Wireless Controller'
+        print("Controller Name: " + ctrl_name)
+        return True
 
     def set_events(self, button_press=None, button_release=None, axis=None):
         """
