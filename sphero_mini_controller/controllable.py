@@ -6,7 +6,7 @@ import time
 import math
 from .vectormovement import *
 from .tracablesphero import TraceableSphero
-import ps4_controller
+from ps4_controller import constants
 from sphero_mini import sphero_mini
 from util import vector
 from tracker import *
@@ -187,24 +187,24 @@ class ControllableSphero(TraceableSphero):
     def _map_controls(self, ps4_controller):
         ps4_controller.set_events(
             button_press={
-                ps4.BUTTON_START: self.disconnect,
+                constants.BUTTON_START: self.disconnect,
 
-                ps4.BUTTON_CIRCLE: self.calibrate,
-                ps4.BUTTON_SQUARE: self.toggle_lights,
-                ps4.BUTTON_CROSS: self.lights_random_color,
-                ps4.BUTTON_TRIANGLE: self.ping,
+                constants.BUTTON_CIRCLE: self.calibrate,
+                constants.BUTTON_SQUARE: self.toggle_lights,
+                constants.BUTTON_CROSS: self.lights_random_color,
+                constants.BUTTON_TRIANGLE: self.ping,
 
-                ps4.BUTTON_JOY_PAD_UP: self.toggle_bouncing_ball,
-                ps4.BUTTON_JOY_PAD_RIGHT: self.toggle_dot_drive
+                constants.BUTTON_JOY_PAD_UP: self.toggle_bouncing_ball,
+                constants.BUTTON_JOY_PAD_RIGHT: self.toggle_dot_drive
             },
             button_release={
 
             },
             axis={
-                ps4.AXIS_JOYSTICK_R_VER: self.set_y,
-                ps4.AXIS_JOYSTICK_R_HOR: self.set_x,
-                ps4.AXIS_JOYSTICK_L_HOR: self.dot_x,
-                ps4.AXIS_JOYSTICK_L_VER: self.dot_y
+                constants.AXIS_JOYSTICK_R_VER: self.set_y,
+                constants.AXIS_JOYSTICK_R_HOR: self.set_x,
+                constants.AXIS_JOYSTICK_L_HOR: self.dot_x,
+                constants.AXIS_JOYSTICK_L_VER: self.dot_y
             }
         )
 
@@ -259,7 +259,7 @@ class ControllableSphero(TraceableSphero):
         Used to set and map the ps4 controller to run the sphero commands
 
         :param ps4_controller:
-        :type ps4_controller: ps4.ps4C
+        :type ps4_controller: constants.ps4C
         """
         self._ps4_controller = ps4_controller
         self._map_controls(ps4_controller)
