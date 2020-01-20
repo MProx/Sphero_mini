@@ -79,6 +79,7 @@ class SpheroMiniPS4Controls(object):
         # self.set_tracking_filter(controllable_sphero, device)
 
         self._controllable_devices.append(controllable_sphero)
+        self._ps4_manager.start()
         return
 
         # self.clean_up_sphero_dev(device)

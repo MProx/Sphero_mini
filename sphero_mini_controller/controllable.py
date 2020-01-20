@@ -187,9 +187,9 @@ class ControllableSphero(TraceableSphero):
     def _map_controls(self, ps4_controller):
         ps4_controller.set_events(
             button_press={
-                constants.BUTTON_START: self.disconnect,
+                # constants.BUTTON_START: self.disconnect,
 
-                constants.BUTTON_CIRCLE: self.calibrate,
+                # constants.BUTTON_CIRCLE: self.calibrate,
                 constants.BUTTON_SQUARE: self.toggle_lights,
                 constants.BUTTON_CROSS: self.lights_random_color,
                 constants.BUTTON_TRIANGLE: self.toggle_lights,
