@@ -64,8 +64,8 @@ class SpheroMiniPS4Controls(object):
         print ("NEW Sphero")
 
         # if device.connect():
-        controllable_sphero = ControllableSphero(device)
-        controllable_sphero.set_sphero_disconnected_cb(self.clean_up_sphero_dev)
+        # controllable_sphero = ControllableSphero(device)
+        # controllable_sphero.set_sphero_disconnected_cb(self.clean_up_sphero_dev)
 
         ps4_ctrl = self._ps4_manager.get_available_controller()
 
@@ -78,7 +78,6 @@ class SpheroMiniPS4Controls(object):
         # self.set_tracking_filter(controllable_sphero, device)
 
         self._controllable_devices.append(controllable_sphero)
-        print( "Controls successfully setup")
         return
 
         # self.clean_up_sphero_dev(device)
