@@ -200,12 +200,12 @@ class ControllableSphero(TraceableSphero):
             button_release={
 
             },
-            axis={
-                constants.AXIS_JOYSTICK_R_VER: self.set_y,
-                constants.AXIS_JOYSTICK_R_HOR: self.set_x,
-                constants.AXIS_JOYSTICK_L_HOR: self.dot_x,
-                constants.AXIS_JOYSTICK_L_VER: self.dot_y
-            }
+            # axis={
+            #     constants.AXIS_JOYSTICK_R_VER: self.set_y,
+            #     constants.AXIS_JOYSTICK_R_HOR: self.set_x,
+            #     constants.AXIS_JOYSTICK_L_HOR: self.dot_x,
+            #     constants.AXIS_JOYSTICK_L_VER: self.dot_y
+            # }
         )
 
     def _on_collision_cb(self, collision_data):
