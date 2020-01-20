@@ -4,6 +4,7 @@ from ps4_controller import manager
 #import tracker
 from sphero_mini import sphero_mini
 from tracker import trackerbase
+from ps4_controller import constants
 
 
 class SpheroMiniPS4Controls(object):
