@@ -184,27 +184,27 @@ class ControllableSphero(TraceableSphero):
                     self.is_inside_dot = True
                     self.vector_control.speed = 0
 
-    def _map_controls(self, ps3_controller):
-        ps3_controller.set_events(
+    def _map_controls(self, ps4_controller):
+        ps4_controller.set_events(
             button_press={
-                ps3.BUTTON_START: self.disconnect,
+                ps4.BUTTON_START: self.disconnect,
 
-                ps3.BUTTON_CIRCLE: self.calibrate,
-                ps3.BUTTON_SQUARE: self.toggle_lights,
-                ps3.BUTTON_CROSS: self.lights_random_color,
-                ps3.BUTTON_TRIANGLE: self.ping,
+                ps4.BUTTON_CIRCLE: self.calibrate,
+                ps4.BUTTON_SQUARE: self.toggle_lights,
+                ps4.BUTTON_CROSS: self.lights_random_color,
+                ps4.BUTTON_TRIANGLE: self.ping,
 
-                ps3.BUTTON_JOY_PAD_UP: self.toggle_bouncing_ball,
-                ps3.BUTTON_JOY_PAD_RIGHT: self.toggle_dot_drive
+                ps4.BUTTON_JOY_PAD_UP: self.toggle_bouncing_ball,
+                ps4.BUTTON_JOY_PAD_RIGHT: self.toggle_dot_drive
             },
             button_release={
 
             },
             axis={
-                ps3.AXIS_JOYSTICK_R_VER: self.set_y,
-                ps3.AXIS_JOYSTICK_R_HOR: self.set_x,
-                ps3.AXIS_JOYSTICK_L_HOR: self.dot_x,
-                ps3.AXIS_JOYSTICK_L_VER: self.dot_y
+                ps4.AXIS_JOYSTICK_R_VER: self.set_y,
+                ps4.AXIS_JOYSTICK_R_HOR: self.set_x,
+                ps4.AXIS_JOYSTICK_L_HOR: self.dot_x,
+                ps4.AXIS_JOYSTICK_L_VER: self.dot_y
             }
         )
 
@@ -254,15 +254,15 @@ class ControllableSphero(TraceableSphero):
             time.sleep(0.01)
         self.vector_control.speed = 0.0
 
-    def set_ps3_controller(self, ps3_controller):
+    def set_ps4_controller(self, ps4_controller):
         """
-        Used to set and map the PS3 controller to run the sphero commands
+        Used to set and map the ps4 controller to run the sphero commands
 
-        :param ps3_controller:
-        :type ps3_controller: ps3.PS3C
+        :param ps4_controller:
+        :type ps4_controller: ps4.ps4C
         """
-        self._ps3_controller = ps3_controller
-        self._map_controls(ps3_controller)
+        self._ps4_controller = ps4_controller
+        self._map_controls(ps4_controller)
 
     @handle_exceptions
     def calibrate(self):
@@ -316,7 +316,7 @@ class ControllableSphero(TraceableSphero):
 
     def _on_sphero_disconnected(self):
         self.vector_control.stop()
-        print ("PS3 / SPHERO clean up")
-        if self._ps3_controller:
-            self._ps3_controller.free()
+        print ("ps4 / SPHERO clean up")
+        if self._ps4_controller:
+            self._ps4_controller.free()
         self._sphero_clean_up_cb(self.device)
