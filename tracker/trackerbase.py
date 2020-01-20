@@ -8,7 +8,7 @@ from .traceable import TraceableObject
 import sys
 sys.path.append("..")
 from util.vector import Vector2D
-import util 
+from util import sampling
 
 class ImageHandler(object):
     @staticmethod
@@ -109,7 +109,7 @@ class ColorTracker(TrackerBase):
 
         # TESTING
         self.number_of_samples = 0
-        self.avg_samples = [util.AvgValueSampleHolder(), util.AvgValueSampleHolder(), util.AvgValueSampleHolder(), util.AvgValueSampleHolder()]
+        self.avg_samples = [sampling.AvgValueSampleHolder(), sampling.AvgValueSampleHolder(), sampling.AvgValueSampleHolder(), sampling.AvgValueSampleHolder()]
 
     def track_objects(self, traceable_objects):
         image = self.get_video_frame()
