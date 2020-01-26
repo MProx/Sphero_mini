@@ -85,6 +85,7 @@ class sphero_mini():
         if self.verbosity > 1:
             print("[INIT] Initialization complete\n")
 
+    @property
     def seq(self):
         """
         A thread-safe method for creating sequence numbers.
