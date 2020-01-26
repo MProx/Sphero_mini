@@ -289,6 +289,7 @@ class sphero_mini():
         characteristic.write(output, withResponse = True)
 
     def waitT(self):
+        start = time.time()
         while(1):
             self.p.waitForNotifications(1)
             if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
@@ -307,7 +308,6 @@ class sphero_mini():
 
     def getAcknowledgement(self, ack):
         #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
-        start = time.time()
         self.waitThread = Thread(target=self.waitT, name="SpheroWaitResponseLoop")
         self.waitThread.daemon = True
         self.waitThread.start()
