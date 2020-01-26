@@ -65,7 +65,7 @@ class sphero_mini():
             print("[INIT] Configuring API dectriptor")
         self.API_descriptor.write(struct.pack('<bb', 0x01, 0x00), withResponse = True)
 
-        self.waitThread = Thread(target=self._response_reciever(self.p, self.sphero_delegate), name="SpheroMessageReceiever")
+        self.waitThread = Thread(target=self._response_reciever, name="SpheroMessageReceiever")
         self.waitThread.daemon = True
         self.waitThread.start()
 
@@ -291,19 +291,19 @@ class sphero_mini():
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
 
-    def _response_reciever(self, peripheral, delegate):
+    def _response_reciever(self):
         while(1):
-            peripheral.waitForNotifications(1)
+            self.p.waitForNotifications(1)
 
-            if delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
+            if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
                 if self.verbosity > 3:
-                    print("[RESP {}] {}".format(self.sequence-1, delegate.notification_ack))
-                delegate.clear_notification()
+                    print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
+                self.sphero_delegate.clear_notification()
                 break
-            elif delegate.notification_seq >= 0:
+            elif self.sphero_delegate.notification_seq >= 0:
                 print("Unexpected ACK. Expected: {}/{}, received: {}/{}".format(
-                    ack, self.sequence, delegate.notification_ack.split()[0],
-                    delegate.notification_seq),
+                    ack, self.sequence, self.sphero_delegate.notification_ack.split()[0],
+                    self.sphero_delegate.notification_seq),
                     file=sys.stderr)
 
 
