@@ -173,7 +173,7 @@ class sphero_mini():
 
         # self.getAcknowledgement("LED/backlight")
 
-     def rollNew(self, speed, heading):
+    def rollNew(self, speed, heading):
         """
         :param speed: speed can have value between 0x00 and 0xFF
         :param heading: heading can have value between 0 and 359
