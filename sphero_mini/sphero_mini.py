@@ -367,7 +367,7 @@ class sphero_mini():
         - End byte: always 0xD8
 
         '''
-        event = Event()
+        event = threading.Event()
 
         sendBytes = [sendPacketConstants["StartOfPacket"],
                     sum([flags["resetsInactivityTimeout"], flags["requestsResponse"]]),
