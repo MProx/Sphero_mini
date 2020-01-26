@@ -288,7 +288,7 @@ class sphero_mini():
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
 
-    def waitT(self):
+    def waitT(self, ack):
         start = time.time()
         while(1):
             self.p.waitForNotifications(1)
@@ -308,7 +308,7 @@ class sphero_mini():
 
     def getAcknowledgement(self, ack):
         #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
-        self.waitThread = Thread(target=self.waitT, name="SpheroWaitResponseLoop")
+        self.waitThread = Thread(target=self.waitT(ack), name="SpheroWaitResponseLoop")
         self.waitThread.daemon = True
         self.waitThread.start()
 
