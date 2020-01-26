@@ -13,8 +13,8 @@ class PS4manager(object):
         self._listen = False
 
         # print("Initializing pygame")
-        # pygame.display.init()
         pygame.init()
+        pygame.display.init()
     
         joystick.init()
 
