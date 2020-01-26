@@ -22,7 +22,10 @@ class sphero_mini():
         self.sequence = 1
         self.v_batt = None # will be updated with battery voltage when sphero.getBatteryVoltage() is called
         self.firmware_version = [] # will be updated with firware version when sphero.returnMainApplicationVersion() is called
-        self.waitThread = None
+
+        self.waitThread = Thread(target=self._response_reciever, name="SpheroMessageReceiever")
+        self.waitThread.daemon = True
+        self.waitThread.start()
 
         if self.verbosity > 0:
             print("[INFO] Connecting to", MACAddr)
@@ -91,7 +94,7 @@ class sphero_mini():
                    commID=powerCommandIDs["wake"],
                    payload=[]) # empty payload
 
-        self.getAcknowledgement("Wake")
+        # self.getAcknowledgement("Wake")
 
     def sleep(self, deepSleep=False):
         '''
@@ -120,7 +123,7 @@ class sphero_mini():
                   commID = userIOCommandIDs["allLEDs"], # 0x0e
                   payload = [0x00, 0x0e, red, green, blue])
 
-        self.getAcknowledgement("LED/backlight")
+        # self.getAcknowledgement("LED/backlight")
 
     def setBackLEDIntensity(self, brightness=None):
         '''
@@ -136,7 +139,7 @@ class sphero_mini():
                   commID = userIOCommandIDs["allLEDs"],
                   payload = [0x00, 0x01, brightness])
 
-        self.getAcknowledgement("LED/backlight")
+        # self.getAcknowledgement("LED/backlight")
 
     def roll(self, speed=None, heading=None):
         '''
@@ -165,7 +168,7 @@ class sphero_mini():
                   commID = drivingCommands["driveWithHeading"],
                   payload = [speedL, headingH, headingL, speedH])
 
-        self.getAcknowledgement("Roll")
+        # self.getAcknowledgement("Roll")
 
     def resetHeading(self):
         '''
@@ -181,7 +184,7 @@ class sphero_mini():
                   commID = drivingCommands["resetHeading"],
                   payload = []) #empty payload
 
-        self.getAcknowledgement("Heading")
+        # self.getAcknowledgement("Heading")
 
     def returnMainApplicationVersion(self):
         '''
@@ -195,7 +198,7 @@ class sphero_mini():
                    commID = SystemInfoCommands['mainApplicationVersion'],
                    payload = []) # empty
 
-        self.getAcknowledgement("Firmware")
+        # self.getAcknowledgement("Firmware")
 
     def getBatteryVoltage(self):
         '''
@@ -210,7 +213,7 @@ class sphero_mini():
                    commID=powerCommandIDs['batteryVoltage'],
                    payload=[]) # empty
 
-        self.getAcknowledgement("Battery")
+        # self.getAcknowledgement("Battery")
 
     def stabilization(self, stab = True):
         '''
@@ -229,7 +232,7 @@ class sphero_mini():
                    commID=drivingCommands['stabilization'],
                    payload=[val])
 
-        self.getAcknowledgement("Stabilization")
+        # self.getAcknowledgement("Stabilization")
 
     def wait(self, delay):
         '''
@@ -288,10 +291,30 @@ class sphero_mini():
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
 
-    def waitT(self, ack):
-        start = time.time()
+    def _response_reciever(self):
         while(1):
             self.p.waitForNotifications(1)
+
+            if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
+                if self.verbosity > 3:
+                    print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
+                self.sphero_delegate.clear_notification()
+                break
+            elif self.sphero_delegate.notification_seq >= 0:
+                print("Unexpected ACK. Expected: {}/{}, received: {}/{}".format(
+                    ack, self.sequence, self.sphero_delegate.notification_ack.split()[0],
+                    self.sphero_delegate.notification_seq),
+                    file=sys.stderr)
+
+
+    def getAcknowledgement(self, ack):
+        #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
+        start = time.time()
+        while(1):
+            # self.waitThread = Thread(target=self.waitT, name="SpheroVectorCtrlLoop")
+            # self.waitThread.daemon = True
+            # self.waitThread.start()
+            # self.p.waitForNotifications(1)
             if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
                 if self.verbosity > 3:
                     print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
@@ -305,14 +328,6 @@ class sphero_mini():
             if time.time() > start + 10:
                 print("Timeout waiting for acknowledgement: {}/{}".format(ack, self.sequence), file=sys.stderr)
                 break
-
-    def getAcknowledgement(self, ack):
-        #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
-        self.waitThread = Thread(target=self.waitT(ack), name="SpheroWaitResponseLoop")
-        self.waitThread.daemon = True
-        self.waitThread.start()
-
-    
 
 # =======================================================================
 # The following functions are experimental:
