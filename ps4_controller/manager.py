@@ -91,6 +91,7 @@ class PS4manager(object):
         self._listen = True
         while self._listen:
             for event in pygame.event.get():
+                print(event)
                 if self._ps4_event(event):
                     self._handle_ps4_event(event)
             time.sleep(1.0 / 50.0)

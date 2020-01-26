@@ -169,6 +169,7 @@ class PS4C(object):
         Helper method: Triggers a on button release cb for the given button down event
         :param e: Pygame.event
         """
+        print("Handle button release")
         self._trigger_cb(self._button_press_callbacks, e.button)
 
     def _handle_axis_event(self, e):

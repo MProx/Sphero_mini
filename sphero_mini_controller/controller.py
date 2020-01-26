@@ -24,7 +24,6 @@ class SpheroMiniPS4Controls(object):
     def run(self, hwaddr):
         
         # connect to peripheral
-        # on_new_sphero
         sphero = sphero_mini.sphero_mini(hwaddr, verbosity = 1)
         self.on_new_sphero(sphero)
         while True:
@@ -76,7 +75,7 @@ class SpheroMiniPS4Controls(object):
         else:
             print ("No free PS4 controller available")
 
-        self.set_tracking_filter(controllable_sphero, device)
+        # self.set_tracking_filter(controllable_sphero, device)
 
         self._controllable_devices.append(controllable_sphero)
         self._ps4_manager.start()
