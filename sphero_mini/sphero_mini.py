@@ -91,7 +91,7 @@ class sphero_mini():
         """
         if not self._receiver_thread:
             self._run_receive = True
-            self._receiver_thread = threading.Thread(target=self._receiver, name="SpheroReceiverThread")
+            self._receiver_thread = threading.Thread(target=self._response_reciever, name="SpheroReceiverThread")
             self._receiver_thread.daemon = True
             self._receiver_thread.start()
 
