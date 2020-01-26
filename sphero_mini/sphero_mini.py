@@ -4,6 +4,7 @@ from .sphero_constants import *
 import struct
 import time
 import sys
+from threading import Thread
 
 class sphero_mini():
     def __init__(self, MACAddr, verbosity = 4, user_delegate = None):
@@ -310,6 +311,7 @@ class sphero_mini():
         self.waitThread = Thread(target=self.waitT, name="SpheroWaitResponseLoop")
         self.waitThread.daemon = True
         self.waitThread.start()
+
     
 
 # =======================================================================
