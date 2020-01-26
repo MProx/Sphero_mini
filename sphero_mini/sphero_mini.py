@@ -5,7 +5,7 @@ import struct
 import time
 import sys
 from threading import Thread
-from .request import *
+# from .request import *
 
 class sphero_mini():
     def __init__(self, MACAddr, verbosity = 4, user_delegate = None):
