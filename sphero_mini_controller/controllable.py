@@ -192,10 +192,10 @@ class ControllableSphero(TraceableSphero):
                 # constants.BUTTON_CIRCLE: self.calibrate,
                 constants.BUTTON_SQUARE: self.toggle_lights,
                 constants.BUTTON_CROSS: self.lights_random_color,
-                constants.BUTTON_TRIANGLE: self.toggle_lights,
+                # constants.BUTTON_TRIANGLE: self.toggle_lights,
 
-                constants.BUTTON_JOY_PAD_UP: self.toggle_lights,
-                constants.BUTTON_JOY_PAD_RIGHT: self.toggle_lights
+                # constants.BUTTON_JOY_PAD_UP: self.toggle_lights,
+                # constants.BUTTON_JOY_PAD_RIGHT: self.toggle_lights
             },
             button_release={
 
