@@ -173,22 +173,6 @@ class sphero_mini():
 
         # self.getAcknowledgement("LED/backlight")
 
-    def rollNew(self, speed, heading):
-        """
-        :param speed: speed can have value between 0x00 and 0xFF
-        :param heading: heading can have value between 0 and 359
-        State:
-        As of the 1.13 firmware version.
-        State   Speed   Result
-        1       > 0     Normal driving
-        1       0       Rotate in place
-        2       x       Force fast rotation
-        0       x       Commence optimal braking to zero speed
-        :return: SimpleResponse
-        :rtype: response.Response
-        """
-        return self._write(request.Roll(self.seq, speed, heading))
-
     def roll(self, speed=None, heading=None):
         '''
         Start to move the Sphero at a given direction and speed.
@@ -246,7 +230,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID = deviceID['systemInfo'],
                    commID = SystemInfoCommands['mainApplicationVersion'],
-                   self.seq,
+                   seq=self.seq,
                    payload = []) # empty
 
         # self.getAcknowledgement("Firmware")
@@ -262,7 +246,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
                    commID=powerCommandIDs['batteryVoltage'],
-                   self.seq,
+                   seq=self.seq,
                    payload=[]) # empty
 
         # self.getAcknowledgement("Battery")
@@ -282,7 +266,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID=deviceID['driving'],
                    commID=drivingCommands['stabilization'],
-                   self.seq,
+                   seq=self.seq,
                    payload=[val])
 
         # self.getAcknowledgement("Stabilization")
