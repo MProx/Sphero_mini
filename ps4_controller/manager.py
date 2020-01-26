@@ -14,6 +14,9 @@ class PS4manager(object):
 
         # print("Initializing pygame")
         # pygame.display.init()
+        pygame.init()
+    
+        joystick.init()
 
         self._init_controllers()
 
