@@ -12,8 +12,8 @@ class PS4manager(object):
         self._controllers = []
         self._listen = False
 
-        print("Initializing pygame")
-        pygame.display.init()
+        # print("Initializing pygame")
+        # pygame.display.init()
 
         self._init_controllers()
 
