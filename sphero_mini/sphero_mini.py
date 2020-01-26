@@ -4,7 +4,7 @@ from .sphero_constants import *
 import struct
 import time
 import sys
-from threading import Thread
+import threading
 # from .request import *
 
 class sphero_mini():
