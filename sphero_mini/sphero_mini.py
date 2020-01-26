@@ -85,6 +85,17 @@ class sphero_mini():
         if self.verbosity > 1:
             print("[INIT] Initialization complete\n")
 
+    def seq(self):
+        """
+        A thread-safe method for creating sequence numbers.
+        :return: a new seq number
+        """
+        with self._seq_lock:
+            self._seq += 1
+            if self._seq > 0xFF:
+                self._seq = 0x00
+            return self._seq
+
     def _start_receiver(self):
         """
         Starts the asynchronous package receiver
@@ -120,7 +131,7 @@ class sphero_mini():
         self._write(characteristic=self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
                    commID=powerCommandIDs["wake"],
-                   seq=self._seq,
+                   seq=self.seq,
                    payload=[]) # empty payload
 
         # self.getAcknowledgement("Wake")
@@ -138,7 +149,7 @@ class sphero_mini():
         self._write(characteristic=self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
                    commID=sleepCommID,
-                   seq=self._seq,
+                   seq=self.seq,
                    payload=[]) #empty payload
 
     def setLEDColor(self, red = None, green = None, blue = None):
@@ -151,7 +162,7 @@ class sphero_mini():
         self._write(characteristic = self.API_V2_characteristic,
                   devID = deviceID['userIO'], # 0x1a
                   commID = userIOCommandIDs["allLEDs"], # 0x0e
-                  seq=self._seq,
+                  seq=self.seq,
                   payload = [0x00, 0x0e, red, green, blue])
 
         # self.getAcknowledgement("LED/backlight")
@@ -168,7 +179,7 @@ class sphero_mini():
         self._write(characteristic = self.API_V2_characteristic,
                   devID = deviceID['userIO'],
                   commID = userIOCommandIDs["allLEDs"],
-                  seq=self._seq,
+                  seq=self.seq,
                   payload = [0x00, 0x01, brightness])
 
         # self.getAcknowledgement("LED/backlight")
@@ -198,7 +209,7 @@ class sphero_mini():
         self._write(characteristic = self.API_V2_characteristic,
                   devID = deviceID['driving'],
                   commID = drivingCommands["driveWithHeading"],
-                  seq=self._seq,
+                  seq=self.seq,
                   payload = [speedL, headingH, headingL, speedH])
 
         # self.getAcknowledgement("Roll")
@@ -215,7 +226,7 @@ class sphero_mini():
         self._write(characteristic = self.API_V2_characteristic,
                   devID = deviceID['driving'],
                   commID = drivingCommands["resetHeading"],
-                  seq=self._seq,
+                  seq=self.seq,
                   payload = []) #empty payload
 
         # self.getAcknowledgement("Heading")
@@ -230,7 +241,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID = deviceID['systemInfo'],
                    commID = SystemInfoCommands['mainApplicationVersion'],
-                   seq=self._seq,
+                   seq=self.seq,
                    payload = []) # empty
 
         # self.getAcknowledgement("Firmware")
@@ -246,7 +257,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID=deviceID['powerInfo'],
                    commID=powerCommandIDs['batteryVoltage'],
-                   seq=self._seq,
+                   seq=self.seq,
                    payload=[]) # empty
 
         # self.getAcknowledgement("Battery")
@@ -266,7 +277,7 @@ class sphero_mini():
         self._write(self.API_V2_characteristic,
                    devID=deviceID['driving'],
                    commID=drivingCommands['stabilization'],
-                   seq=self._seq,
+                   seq=self.seq,
                    payload=[val])
 
         # self.getAcknowledgement("Stabilization")
