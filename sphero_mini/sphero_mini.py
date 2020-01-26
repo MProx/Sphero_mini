@@ -387,7 +387,7 @@ class sphero_mini():
         #                   from the device ID through the end of the data payload,
         #                   bit inverted (1's complement)"
         # For the sphero mini, the flag bits must be included too:
-        print("Send bytes:" + sendBytes)
+        print("Send bytes:" + seq)
         checksum = 0
         for num in sendBytes[1:]:
             checksum = (checksum + num) & 0xFF # bitwise "and to get modulo 256 sum of appropriate bytes
