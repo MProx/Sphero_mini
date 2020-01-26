@@ -21,6 +21,7 @@ class sphero_mini():
         self.sequence = 1
         self.v_batt = None # will be updated with battery voltage when sphero.getBatteryVoltage() is called
         self.firmware_version = [] # will be updated with firware version when sphero.returnMainApplicationVersion() is called
+        self.waitThread = None
 
         if self.verbosity > 0:
             print("[INFO] Connecting to", MACAddr)
@@ -286,9 +287,7 @@ class sphero_mini():
         #send to specified characteristic:
         characteristic.write(output, withResponse = True)
 
-    def getAcknowledgement(self, ack):
-        #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
-        start = time.time()
+    def waitT(self):
         while(1):
             self.p.waitForNotifications(1)
             if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
@@ -304,6 +303,14 @@ class sphero_mini():
             if time.time() > start + 10:
                 print("Timeout waiting for acknowledgement: {}/{}".format(ack, self.sequence), file=sys.stderr)
                 break
+
+    def getAcknowledgement(self, ack):
+        #wait up to 10 secs for correct acknowledgement to come in, including sequence number!
+        start = time.time()
+        self.waitThread = Thread(target=self.waitT, name="SpheroWaitResponseLoop")
+        self.waitThread.daemon = True
+        self.waitThread.start()
+    
 
 # =======================================================================
 # The following functions are experimental:
