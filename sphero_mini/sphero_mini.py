@@ -295,6 +295,7 @@ class sphero_mini():
                 break
 
     def _write(self, characteristic=None, devID=None, commID=None, seq=None, payload=[]):
+        print("Writing SEQ #:" + str(seq))
         event = self._send(characteristic,devID,commID,seq,payload)
 
         if event.wait(self.response_timeout):
@@ -311,12 +312,12 @@ class sphero_mini():
                     devID,
                     commID,
                     seq] + payload # concatenate payload list
-            self._clean_up_failed_request(sendBytes)
+            self._clean_up_failed_request(seq)
 
     def _add_received_response(self, response_object):
         with self._response_lock:
             self._responses.append(response_object)
-        self._notify_request_received(response_object.seq)
+        self._notify_request_received(response_object)
 
     def _notify_request_received(self, seq):
         try:
@@ -334,10 +335,14 @@ class sphero_mini():
         :raise: IndexError
         :return: The request object
         """
-        with self._response_lock:
-            res = next((res for res in self._responses if res.seq == seq), None)
-            self._responses.remove(res)
-            return res
+        
+        if seq > 0x00:
+            print("removing " + str(seq))
+            with self._response_lock:
+                res = next((res for res in self._responses if res == seq), None)
+                if res:
+                    self._responses.remove(res)
+                return res
 
     def _clean_up_failed_request(self, packet):
         try:
@@ -345,7 +350,7 @@ class sphero_mini():
         except ValueError:
             pass
         try:
-            self._requests_waiting_response.pop(packet.seq)
+            self._requests_waiting_response.pop(packet)
         except KeyError:
             pass
         
@@ -411,20 +416,21 @@ class sphero_mini():
     def _response_reciever(self):
         while(1):
             if (self.p.waitForNotifications(1)):
-                self._add_received_response(self.sphero_delegate.notificationPacket)
-                self._get_response(self.sphero_delegate.notification_seq)
+                print("Received SEQ #:" + str(self.sphero_delegate.notification_seq))
+                self._add_received_response(self.sphero_delegate.notification_seq)
+                # self._get_response(self.sphero_delegate.notification_seq)
 
-                if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
+                # if self.sphero_delegate.notification_seq == self.sequence-1: # use one less than sequence, because _send function increments it for next send. 
                     
-                    if self.verbosity > 3:
-                        print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
-                    self.sphero_delegate.clear_notification()
-                    break
-                elif self.sphero_delegate.notification_seq >= 0:
-                    print("Unexpected ACK. Expected: {}/{}, received: {}/{}".format(
-                        ack, self.sequence, self.sphero_delegate.notification_ack.split()[0],
-                        self.sphero_delegate.notification_seq),
-                        file=sys.stderr)
+                    # if self.verbosity > 3:
+                    #     print("[RESP {}] {}".format(self.sequence-1, self.sphero_delegate.notification_ack))
+                    # self.sphero_delegate.clear_notification()
+                    # break
+                # elif self.sphero_delegate.notification_seq >= 0:
+                #     print("Unexpected ACK. Expected: {}/{}, received: {}/{}".format(
+                #         ack, self.sequence, self.sphero_delegate.notification_ack.split()[0],
+                #         self.sphero_delegate.notification_seq),
+                #         file=sys.stderr)
 
 
     def getAcknowledgement(self, ack):
